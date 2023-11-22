@@ -2,24 +2,24 @@ import React from "react";
 
 const Header = () => {
   return (
-    <nav class="navbar navbar-light">
-      <div class="container">
-        <a class="navbar-brand" href="/">
+    <nav className="navbar navbar-light">
+      <div className="container">
+        <a className="navbar-brand" href="/">
           conduit
         </a>
-        <ul class="nav navbar-nav flex-row ml-auto">
-          <li class="nav-item">
-            <a class="nav-link active" href="/">
+        <ul className="nav navbar-nav flex-row ml-auto">
+          <li className="nav-item">
+            <a className="nav-link active" href="/">
               Home
             </a>
           </li>
-          <li class="nav-item" style={{ marginLeft: "1rem" }}>
-            <a class="nav-link" href="/login">
+          <li className="nav-item" style={{ marginLeft: "1rem" }}>
+            <a className="nav-link" href="/login">
               Sign in
             </a>
           </li>
-          <li class="nav-item" style={{ marginLeft: "1rem" }}>
-            <a class="nav-link" href="/register">
+          <li className="nav-item" style={{ marginLeft: "1rem" }}>
+            <a className="nav-link" href="/register">
               Sign up
             </a>
           </li>
