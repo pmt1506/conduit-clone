@@ -35,18 +35,6 @@ const Header = () => {
     }
   };
 
-  const handleLogout = () => {
-    // Clear user token from sessionStorage
-    sessionStorage.removeItem("userToken");
-
-    // Update component state to reflect logout
-    setUserToken(null);
-    setUserInfo(null);
-
-    // Console log
-    console.log("Logout Successfully");
-  };
-
   return (
     <nav className="navbar navbar-light">
       <div className="container">
@@ -95,11 +83,6 @@ const Header = () => {
                 <a className="nav-link" href="#">
                   {userInfo.username}
                 </a>
-              </li>
-              <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <button className="nav-link" onClick={handleLogout}>
-                  Logout
-                </button>
               </li>
             </>
           ) : (

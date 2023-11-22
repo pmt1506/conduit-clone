@@ -11,6 +11,11 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    // Update the document title
+    document.title = `Register -- Conduit`;
+  });
+
   const handleRegister = async (e) => {
     e.preventDefault();
 

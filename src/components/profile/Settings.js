@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../../css/Settings.css";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
   const [user, setUser] = useState(null);
@@ -10,6 +11,8 @@ const Settings = () => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState(""); // New password field
 
+  const navigate = useNavigate();
+
   // State for update status (success or failure)
   const [updateStatus, setUpdateStatus] = useState({
     success: null,
@@ -17,8 +20,17 @@ const Settings = () => {
   });
 
   useEffect(() => {
+    // Update the document title
+    document.title = `Setting -- Conduit`;
+
     // Retrieve the user token from sessionStorage
     const userToken = sessionStorage.getItem("userToken");
+
+    if (!userToken) {
+      // If no user token, redirect to login page
+      navigate("/login");
+      return; // Stop further execution
+    }
 
     if (userToken) {
       // Include the token in the headers of the Axios request
@@ -39,6 +51,8 @@ const Settings = () => {
           setEmail(response.data.user.email || "");
 
           console.log({ userToken });
+
+          
         })
         .catch((error) => {
           // Handle error
