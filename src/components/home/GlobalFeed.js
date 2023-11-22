@@ -23,7 +23,7 @@ const GlobalFeed = ({ articles, loading }) => (
               <span className="date">{formatDate(article.createdAt)}</span>
             </div>
             <button className="btn btn-outline-danger btn-sm pull-xs-right">
-              <i class="bi bi-suit-heart-fill mx-1"></i>
+              <i className="bi bi-suit-heart-fill mx-1"></i>
               {article.favoritesCount}
             </button>
           </div>
