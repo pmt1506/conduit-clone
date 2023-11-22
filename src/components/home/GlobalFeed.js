@@ -16,7 +16,7 @@ const GlobalFeed = ({ articles, loading }) => (
             <a href="">
               <img src={article.author.image} alt={article.author.username} />
             </a>
-            <div className="">
+            <div className="info">
               <a href="" className="author">
                 {article.author.username}
               </a>
