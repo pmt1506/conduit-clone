@@ -108,7 +108,7 @@ const Home = () => {
 
               <GlobalFeed articles={currentArticles} loading={loadingArticles} />
 
-              {totalPages > 1 && (
+              {!loadingArticles && totalPages > 1 && (
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -117,7 +117,6 @@ const Home = () => {
                   goToNextPage={goToNextPage}
                 />
               )}
-
             </div>
 
             <div className="col-md-3">
