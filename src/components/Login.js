@@ -1,13 +1,27 @@
-import React, { useState } from "react";
+// Login.js
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../css/Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  // Use useEffect to check for state parameters on component mount
+  useEffect(() => {
+    const { state } = location;
+
+    if (state && state.email && state.password) {
+      // Autofill email and password fields
+      setEmail(state.email);
+      setPassword(state.password);
+    }
+  }, [location]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,12 +31,15 @@ const Login = () => {
     console.log("Password:", password);
 
     try {
-      const response = await axios.post("https://api.realworld.io/api/users/login", {
-        user: {
-          email,
-          password,
-        },
-      });
+      const response = await axios.post(
+        "https://api.realworld.io/api/users/login",
+        {
+          user: {
+            email,
+            password,
+          },
+        }
+      );
 
       // Assuming the API returns a user object upon successful login
       const user = response.data.user;
@@ -43,7 +60,12 @@ const Login = () => {
         <div className="offset-md-3 col-xs-12 login-body">
           <h1 className="text-center">Sign in</h1>
           <p className="text-center">
-            <a href="/register">Need an account?</a>
+            <a
+              href="/register"
+              style={{ textDecoration: "none", color: "#5CB85C" }}
+            >
+              Need an account?
+            </a>
           </p>
           <form onSubmit={handleLogin}>
             <div className="form-group">

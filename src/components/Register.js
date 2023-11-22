@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+// Register.js
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,17 +37,8 @@ const Register = () => {
       // Clear error message
       setError("");
 
-      // Log in the user after successful registration
-      await axios.post("https://api.realworld.io/api/users/login", {
-        user: {
-          email,
-          password,
-        },
-      });
-
-      // Assuming successful login, you might want to handle the login state in your application
-      console.log("User logged in after registration");
-
+      // Redirect to login page with email and password as state parameters
+      navigate("/login", { state: { email, password } });
     } catch (error) {
       if (error.response && error.response.status === 422) {
         // Validation errors
@@ -70,7 +65,12 @@ const Register = () => {
         <div className="offset-md-3 col-xs-12 login-body">
           <h1 className="text-center">Sign up</h1>
           <p className="text-center">
-            <a href="/login">Have an account?</a>
+            <a
+              href="/login"
+              style={{ textDecoration: "none", color: "#5CB85C" }}
+            >
+              Have an account?
+            </a>
           </p>
           <form onSubmit={handleRegister}>
             <div className="form-group">
