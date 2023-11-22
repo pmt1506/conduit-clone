@@ -148,7 +148,7 @@ const Home = () => {
                     ))
                   )}
                 </div>
-                <div className="post-preview">No tags are here... yet.</div>
+                {/* <div className="post-preview">No tags are here... yet.</div> */}
               </div>
             </div>
           </div>
