@@ -49,6 +49,9 @@ const Login = () => {
 
       // Redirect to home page after successful login
       navigate("/");
+
+      // Reload the page after redirecting (this may help with header errors)
+      window.location.reload();
     } catch (error) {
       setError("Invalid email or password. Please try again.");
     }

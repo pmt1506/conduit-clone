@@ -14,7 +14,7 @@
     padding: 0.75rem 1.5rem !important;
 }
 
-button{
+.form-group button{
     float: right;
     background-color: #5CB85C !important;
     border-color: #5CB85C !important;
