@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import GlobalFeed from './GlobalFeed';
-import YourFeed from './YourFeed';
-import Pagination from './Pagination';
-import Tags from './Tags';
+import React, { useState, useEffect } from "react";
+import GlobalFeed from "./GlobalFeed";
+import YourFeed from "./YourFeed";
+import Pagination from "./Pagination";
+import Tags from "./Tags";
+import "../../css/Home.css";
 
 const Home = () => {
   const [tags, setTags] = useState([]);
@@ -34,7 +35,11 @@ const Home = () => {
     const fetchArticles = async () => {
       try {
         setLoadingArticles(true);
-        const response = await fetch(`https://api.realworld.io/api/articles?limit=197${selectedTag ? `&tag=${selectedTag}` : ''}`);
+        const response = await fetch(
+          `https://api.realworld.io/api/articles?limit=197${
+            selectedTag ? `&tag=${selectedTag}` : ""
+          }`
+        );
         const data = await response.json();
         setArticles(data.articles);
       } catch (error) {
@@ -74,7 +79,7 @@ const Home = () => {
 
   return (
     <div>
-      <div className="home-page container">
+      <div className="home-page">
         <div className="banner">
           <div className="container">
             <h1 className="logo-font">conduit</h1>
@@ -89,9 +94,10 @@ const Home = () => {
                 <ul className="nav nav-pills outline-active">
                   <li className="nav-item">
                     <a
-                      className={`nav-link ${!selectedTag ? 'active' : ''}`}
+                      className={`nav-link ${!selectedTag ? "active" : ""}`}
                       href=""
                       onClick={() => setSelectedTag(null)}
+                      style={{ color: "#aaa" }}
                     >
                       Global Feed
                     </a>
@@ -106,7 +112,10 @@ const Home = () => {
                 </ul>
               </div>
 
-              <GlobalFeed articles={currentArticles} loading={loadingArticles} />
+              <GlobalFeed
+                articles={currentArticles}
+                loading={loadingArticles}
+              />
 
               {!loadingArticles && totalPages > 1 && (
                 <Pagination
@@ -122,7 +131,11 @@ const Home = () => {
             <div className="col-md-3">
               <div className="sidebar">
                 <p>Popular Tags</p>
-                <Tags tags={tags} loading={loadingTags} onTagClick={handleTagClick} />
+                <Tags
+                  tags={tags}
+                  loading={loadingTags}
+                  onTagClick={handleTagClick}
+                />
               </div>
             </div>
           </div>
