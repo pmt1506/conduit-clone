@@ -27,7 +27,7 @@ const Home = () => {
       }
     };
     fetchTags();
-  }, []); 
+  }, []);
 
   useEffect(() => {
     // Fetch articles when selectedTag changes
@@ -99,7 +99,7 @@ const Home = () => {
                   {selectedTag && (
                     <li className="nav-item">
                       <a className="nav-link active" href="">
-                        {selectedTag}
+                        #{selectedTag}
                       </a>
                     </li>
                   )}
@@ -108,13 +108,16 @@ const Home = () => {
 
               <GlobalFeed articles={currentArticles} loading={loadingArticles} />
 
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                handlePageChange={handlePageChange}
-                goToPreviousPage={goToPreviousPage}
-                goToNextPage={goToNextPage}
-              />
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  handlePageChange={handlePageChange}
+                  goToPreviousPage={goToPreviousPage}
+                  goToNextPage={goToNextPage}
+                />
+              )}
+
             </div>
 
             <div className="col-md-3">
