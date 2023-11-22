@@ -7,31 +7,44 @@ import Tags from './Tags';
 const Home = () => {
   const [tags, setTags] = useState([]);
   const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingTags, setLoadingTags] = useState(true);
+  const [loadingArticles, setLoadingArticles] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedTag, setSelectedTag] = useState(null);
   const articlesPerPage = 10;
 
   useEffect(() => {
-    const fetchData = async (url, setDataCallback) => {
+    // Fetch tags only once when the component mounts
+    const fetchTags = async () => {
       try {
-        const response = await fetch(url);
+        const response = await fetch("https://api.realworld.io/api/tags");
         const data = await response.json();
-        setDataCallback(data);
+        setTags(data.tags);
       } catch (error) {
-        console.error(`Error fetching data from ${url}:`, error);
+        console.error("Error fetching tags:", error);
       } finally {
-        setLoading(false);
+        setLoadingTags(false);
       }
     };
+    fetchTags();
+  }, []); 
 
-    const fetchAllData = async () => {
-      setLoading(true);
-      await fetchData("https://api.realworld.io/api/tags", (data) => setTags(data.tags));
-      await fetchData("https://api.realworld.io/api/articles?limit=197", (data) => setArticles(data.articles));
+  useEffect(() => {
+    // Fetch articles when selectedTag changes
+    const fetchArticles = async () => {
+      try {
+        setLoadingArticles(true);
+        const response = await fetch(`https://api.realworld.io/api/articles?limit=197${selectedTag ? `&tag=${selectedTag}` : ''}`);
+        const data = await response.json();
+        setArticles(data.articles);
+      } catch (error) {
+        console.error(`Error fetching articles for tag ${selectedTag}:`, error);
+      } finally {
+        setLoadingArticles(false);
+      }
     };
-
-    fetchAllData();
-  }, []);
+    fetchArticles();
+  }, [selectedTag]);
 
   const totalArticles = articles.length;
   const totalPages = Math.ceil(totalArticles / articlesPerPage);
@@ -53,6 +66,12 @@ const Home = () => {
   const endIndex = startIndex + articlesPerPage;
   const currentArticles = articles.slice(startIndex, endIndex);
 
+  const handleTagClick = (tag) => {
+    console.log("Selected Tag:", tag);
+    setCurrentPage(1);
+    setSelectedTag(tag);
+  };
+
   return (
     <div>
       <div className="home-page container">
@@ -68,24 +87,26 @@ const Home = () => {
             <div className="col-md-9">
               <div className="feed-toggle">
                 <ul className="nav nav-pills outline-active">
-                  {/* <li className="nav-item">
-                    <a className="nav-link" href="">
-                      Your Feed
-                    </a>
-                  </li> */}
                   <li className="nav-item">
-                    <a className="nav-link active" href="">
+                    <a
+                      className={`nav-link ${!selectedTag ? 'active' : ''}`}
+                      href=""
+                      onClick={() => setSelectedTag(null)}
+                    >
                       Global Feed
                     </a>
                   </li>
+                  {selectedTag && (
+                    <li className="nav-item">
+                      <a className="nav-link active" href="">
+                        {selectedTag}
+                      </a>
+                    </li>
+                  )}
                 </ul>
               </div>
 
-              {/* Adjusted the condition after login here */}
-
-              {/* <YourFeed articles={currentArticles} /> */}
-
-              <GlobalFeed articles={currentArticles} loading={loading} />
+              <GlobalFeed articles={currentArticles} loading={loadingArticles} />
 
               <Pagination
                 currentPage={currentPage}
@@ -99,7 +120,7 @@ const Home = () => {
             <div className="col-md-3">
               <div className="sidebar">
                 <p>Popular Tags</p>
-                <Tags tags={tags} loading={loading} />
+                <Tags tags={tags} loading={loadingTags} onTagClick={handleTagClick} />
               </div>
             </div>
           </div>
