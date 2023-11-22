@@ -28,6 +28,8 @@ const Home = () => {
       }
     };
     fetchTags();
+
+    document.title = 'Home -- Conduit';
   }, []);
 
   useEffect(() => {
