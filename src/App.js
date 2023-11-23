@@ -8,7 +8,6 @@ import Register from "./components/Register";
 import Settings from "./components/profile/Settings";
 import Profile from "./components/profile/Profile";
 
-
 function App() {
   return (
     <BrowserRouter>
@@ -21,7 +20,6 @@ function App() {
           <Route path="/settings" element={<Settings/>}/>
           <Route path="/:username" element={<Profile />} />
         </Routes>
-        {/* <Footer/> */}
       </div>
     </BrowserRouter>
   );

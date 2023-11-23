@@ -7,7 +7,7 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const { username: profileUsername } = useParams();
-  const userToken = sessionStorage.getItem("userToken");
+  const userToken = localStorage.getItem("userToken");
   const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
