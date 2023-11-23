@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import "../../css/Profile.css";
+// Profile.js
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import '../../css/Profile.css';
+import FollowButton from './FollowButton';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -9,7 +11,7 @@ const Profile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   const { username: profileUsername } = useParams();
-  const userToken = localStorage.getItem("userToken");
+  const userToken = localStorage.getItem('userToken');
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -25,20 +27,20 @@ const Profile = () => {
         setUser(response.data.profile);
         setIsFollowing(response.data.profile.following);
       } catch (error) {
-        console.error("Error fetching profile data:", error);
+        console.error('Error fetching profile data:', error);
       }
     };
 
     const fetchAuthenticatedUser = async () => {
       try {
-        const response = await axios.get("https://api.realworld.io/api/user", {
+        const response = await axios.get('https://api.realworld.io/api/user', {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
         });
         setAuthenticatedUser(response.data.user);
       } catch (error) {
-        console.error("Error fetching authenticated user:", error);
+        console.error('Error fetching authenticated user:', error);
       }
     };
 
@@ -49,32 +51,9 @@ const Profile = () => {
   const isOwnProfile =
     authenticatedUser && user && authenticatedUser.username === user.username;
 
-  const handleToggleFollow = async () => {
-    try {
-      const response = isFollowing
-        ? await axios.delete(
-            `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
-            {
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            }
-          )
-        : await axios.post(
-            `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            }
-          );
-
-      setUser(response.data.profile);
-      setIsFollowing(!isFollowing);
-    } catch (error) {
-      console.error("Error toggling follow:", error);
-    }
+  const handleUpdateFollow = (updatedProfile) => {
+    setUser(updatedProfile);
+    setIsFollowing(updatedProfile.following);
   };
 
   return (
@@ -84,10 +63,10 @@ const Profile = () => {
           <div
             className="row"
             style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              textAlign: "center",
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
             }}
           >
             {user && (
@@ -96,43 +75,21 @@ const Profile = () => {
                 <h4>{user.username}</h4>
                 <p>{user.bio}</p>
                 {!isOwnProfile && (
-                  <div>
-                    <button
-                      className="btn btn-sm btn-outline-secondary action-btn"
-                      style={{ float: "right", marginRight: "10px" }}
-                      onClick={handleToggleFollow}
-                    >
-                      {isFollowing ? (
-                        <>
-                          <i
-                            className="bi bi-x-lg"
-                            style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                          ></i>
-                          Unfollow {user.username}
-                        </>
-                      ) : (
-                        <>
-                          <i
-                            className="bi bi-plus-lg"
-                            style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                          ></i>
-                          Follow {user.username}
-                        </>
-                      )}
-                    </button>
-                  </div>
+                  <FollowButton
+                    profileUsername={user.username}
+                    userToken={userToken}
+                    isFollowing={isFollowing}
+                    onUpdateFollow={handleUpdateFollow}
+                  />
                 )}
                 {isOwnProfile && (
                   <div>
                     <a
                       href="/settings"
                       className="btn btn-sm btn-outline-secondary action-btn"
-                      style={{ float: "right", marginRight: "10px" }}
+                      style={{ float: 'right', marginRight: '10px' }}
                     >
-                      <i
-                        className="bi bi-gear"
-                        style={{ marginRight: "0.15rem" }}
-                      ></i>
+                      <i className="bi bi-gear" style={{ marginRight: '0.15rem' }}></i>
                       Edit Profile Settings
                     </a>
                   </div>
