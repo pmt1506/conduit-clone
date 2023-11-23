@@ -1,0 +1,17 @@
+.setting-container{
+    width: 50% !important;
+    max-width: 50% !important;
+}
+
+/* .form-group button{
+    float: right;
+    background-color: #5CB85C !important;
+    border-color: #5CB85C !important;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1.25rem !important;
+    border-radius: 0.3rem !important;
+} */
+
+.bio{
+    padding: 0.75rem 1.5rem !important;
+}

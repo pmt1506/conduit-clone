@@ -14,6 +14,9 @@ const Login = () => {
 
   // Use useEffect to check for state parameters on component mount
   useEffect(() => {
+    // Update the document title
+    document.title = `Login -- Conduit`;
+    
     const { state } = location;
 
     if (state && state.email && state.password) {
