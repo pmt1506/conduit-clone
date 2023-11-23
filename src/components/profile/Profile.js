@@ -11,6 +11,10 @@ const Profile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
+    document.title = `${profileUsername} -- Conduit`
+  });
+
+  useEffect(() => {
     const fetchUserProfile = () => {
       if (profileUsername) {
         axios
@@ -54,6 +58,9 @@ const Profile = () => {
       );
     }
   }, [authenticatedUser, user]);
+
+  const isOwnProfile =
+    authenticatedUser && user && authenticatedUser.username === user.username;
 
   const handleFollowToggle = () => {
     if (userToken) {
@@ -99,35 +106,51 @@ const Profile = () => {
                 <img src={user.image} alt="#" className="user-img" />
                 <h4>{user.username}</h4>
                 <p>{user.bio}</p>
-                {isFollowing ? (
-                  // Render "Unfollow" button
+                {isOwnProfile ? (
+                  // Render "Edit Profile Settings" button for own profile
                   <div>
-                    <button
+                    <a
+                      href="/settings"
                       className="btn btn-sm btn-outline-secondary action-btn"
-                      style={{ float: "right" }}
-                      onClick={handleFollowToggle}
+                      style={{ float: "right", marginRight: "10px" }}
                     >
                       <i
-                        class="bi bi-x-lg"
-                        style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                        className="bi bi-gear"
+                        style={{ marginRight: "0.15rem" }}
                       ></i>
-                      Unfollow {profileUsername}
-                    </button>
+                      Edit Profile Settings
+                    </a>
                   </div>
                 ) : (
-                  // Render "Follow" button
+                  // Render "Follow/Unfollow" button for other profiles
                   <div>
-                    <button
-                      className="btn btn-sm btn-outline-secondary action-btn"
-                      style={{ float: "right" }}
-                      onClick={handleFollowToggle}
-                    >
-                      <i
-                        class="bi bi-plus-lg"
-                        style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                      ></i>
-                      Follow {profileUsername}
-                    </button>
+                    {isFollowing ? (
+                      // Render "Unfollow" button
+                      <button
+                        className="btn btn-sm btn-outline-secondary action-btn"
+                        style={{ float: "right" }}
+                        onClick={handleFollowToggle}
+                      >
+                        <i
+                          className="bi bi-x-lg"
+                          style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                        ></i>
+                        Unfollow {profileUsername}
+                      </button>
+                    ) : (
+                      // Render "Follow" button
+                      <button
+                        className="btn btn-sm btn-outline-secondary action-btn"
+                        style={{ float: "right" }}
+                        onClick={handleFollowToggle}
+                      >
+                        <i
+                          className="bi bi-plus-lg"
+                          style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                        ></i>
+                        Follow {profileUsername}
+                      </button>
+                    )}
                   </div>
                 )}
               </>
