@@ -6,90 +6,79 @@ import "../../css/Profile.css";
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
-  const { username: profileUsername } = useParams();
-  const userToken = localStorage.getItem("userToken");
   const [isFollowing, setIsFollowing] = useState(false);
 
-  useEffect(() => {
-    document.title = `${profileUsername} -- Conduit`
-  });
+  const { username: profileUsername } = useParams();
+  const userToken = localStorage.getItem("userToken");
 
   useEffect(() => {
-    const fetchUserProfile = () => {
-      if (profileUsername) {
-        axios
-          .get(`https://api.realworld.io/api/profiles/${profileUsername}`)
-          .then((response) => {
-            setUser(response.data.profile);
-          })
-          .catch((error) => {
-            console.error("Error fetching user data:", error);
-          });
-      }
-    };
-
-    const fetchAuthenticatedUser = () => {
-      if (userToken) {
-        axios
-          .get("https://api.realworld.io/api/user", {
+    const fetchProfileData = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.realworld.io/api/profiles/${profileUsername}`,
+          {
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
-          })
-          .then((response) => {
-            setAuthenticatedUser(response.data.user);
-          })
-          .catch((error) => {
-            console.error("Error fetching authenticated user data:", error);
-          });
+          }
+        );
+        setUser(response.data.profile);
+        setIsFollowing(response.data.profile.following);
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
       }
     };
 
-    fetchUserProfile();
+    const fetchAuthenticatedUser = async () => {
+      try {
+        const response = await axios.get("https://api.realworld.io/api/user", {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        });
+        setAuthenticatedUser(response.data.user);
+      } catch (error) {
+        console.error("Error fetching authenticated user:", error);
+      }
+    };
+
+    fetchProfileData();
     fetchAuthenticatedUser();
   }, [profileUsername, userToken]);
-
-  useEffect(() => {
-    // Check if the authenticated user is defined and already following the profile user
-    if (authenticatedUser && user) {
-      setIsFollowing(
-        authenticatedUser.following &&
-          authenticatedUser.following.includes(user.username)
-      );
-    }
-  }, [authenticatedUser, user]);
 
   const isOwnProfile =
     authenticatedUser && user && authenticatedUser.username === user.username;
 
-  const handleFollowToggle = () => {
-    if (userToken) {
-      const followEndpoint = `https://api.realworld.io/api/profiles/${profileUsername}/follow`;
+  const handleToggleFollow = async () => {
+    try {
+      const response = isFollowing
+        ? await axios.delete(
+            `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
+            {
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          )
+        : await axios.post(
+            `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
 
-      const requestConfig = {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      };
-
-      // Toggle follow status
-      if (isFollowing) {
-        // Unfollow
-        axios.delete(followEndpoint, requestConfig).then(() => {
-          setIsFollowing(false);
-        });
-      } else {
-        // Follow
-        axios.post(followEndpoint, {}, requestConfig).then(() => {
-          setIsFollowing(true);
-        });
-      }
+      setUser(response.data.profile);
+      setIsFollowing(!isFollowing);
+    } catch (error) {
+      console.error("Error toggling follow:", error);
     }
   };
 
   return (
     <div className="profile-page">
-      {/* User's basic info & action buttons  */}
       <div className="user-info">
         <div className="container">
           <div
@@ -106,8 +95,34 @@ const Profile = () => {
                 <img src={user.image} alt="#" className="user-img" />
                 <h4>{user.username}</h4>
                 <p>{user.bio}</p>
-                {isOwnProfile ? (
-                  // Render "Edit Profile Settings" button for own profile
+                {!isOwnProfile && (
+                  <div>
+                    <button
+                      className="btn btn-sm btn-outline-secondary action-btn"
+                      style={{ float: "right", marginRight: "10px" }}
+                      onClick={handleToggleFollow}
+                    >
+                      {isFollowing ? (
+                        <>
+                          <i
+                            className="bi bi-x-lg"
+                            style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                          ></i>
+                          Unfollow {user.username}
+                        </>
+                      ) : (
+                        <>
+                          <i
+                            className="bi bi-plus-lg"
+                            style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                          ></i>
+                          Follow {user.username}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+                {isOwnProfile && (
                   <div>
                     <a
                       href="/settings"
@@ -120,37 +135,6 @@ const Profile = () => {
                       ></i>
                       Edit Profile Settings
                     </a>
-                  </div>
-                ) : (
-                  // Render "Follow/Unfollow" button for other profiles
-                  <div>
-                    {isFollowing ? (
-                      // Render "Unfollow" button
-                      <button
-                        className="btn btn-sm btn-outline-secondary action-btn"
-                        style={{ float: "right" }}
-                        onClick={handleFollowToggle}
-                      >
-                        <i
-                          className="bi bi-x-lg"
-                          style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                        ></i>
-                        Unfollow {profileUsername}
-                      </button>
-                    ) : (
-                      // Render "Follow" button
-                      <button
-                        className="btn btn-sm btn-outline-secondary action-btn"
-                        style={{ float: "right" }}
-                        onClick={handleFollowToggle}
-                      >
-                        <i
-                          className="bi bi-plus-lg"
-                          style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                        ></i>
-                        Follow {profileUsername}
-                      </button>
-                    )}
                   </div>
                 )}
               </>
