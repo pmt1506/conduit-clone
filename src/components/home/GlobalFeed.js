@@ -17,7 +17,7 @@ const GlobalFeed = ({ articles, loading }) => (
               <img src={article.author.image} alt={article.author.username} />
             </a>
             <div className="info">
-              <a href="" className="author">
+              <a href={`/${article.author.username}`} className="author">
                 {article.author.username}
               </a>
               <span className="date">{formatDate(article.createdAt)}</span>
