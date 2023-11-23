@@ -6,3 +6,16 @@
     color: #5CB85C !important;
     font-weight: 650 !important;
 }
+
+.navbar-light .nav-item .nav-link{
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.navbar-light .nav-item .nav-link:hover{
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.navbar .nav a{
+    font-size: 16px !important;
+}
+
