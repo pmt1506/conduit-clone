@@ -14,6 +14,9 @@ const Login = () => {
 
   // Use useEffect to check for state parameters on component mount
   useEffect(() => {
+    // Update the document title
+    document.title = `Login -- Conduit`;
+
     const { state } = location;
 
     if (state && state.email && state.password) {
@@ -44,8 +47,8 @@ const Login = () => {
       // Assuming the API returns a user object upon successful login
       const user = response.data.user;
 
-      // Store user token in sessionStorage
-      sessionStorage.setItem("userToken", user.token);
+      // Store user token in localStorage
+      localStorage.setItem("userToken", user.token);
 
       // Redirect to home page after successful login
       navigate("/");

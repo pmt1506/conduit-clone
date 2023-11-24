@@ -15,6 +15,7 @@ const Home = () => {
   const articlesPerPage = 10;
 
   useEffect(() => {
+    document.title = "Home -- Conduit";
     // Fetch tags only once when the component mounts
     const fetchTags = async () => {
       try {
@@ -28,8 +29,6 @@ const Home = () => {
       }
     };
     fetchTags();
-
-    document.title = 'Home -- Conduit';
   }, []);
 
   useEffect(() => {
