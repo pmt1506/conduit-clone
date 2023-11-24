@@ -11,6 +11,8 @@ const Header = () => {
     const tokenFromStorage = localStorage.getItem("userToken");
     setUserToken(tokenFromStorage);
 
+    console.log("This is Token from Header: ",{tokenFromStorage});
+
     // Fetch user information if the user is logged in
     if (tokenFromStorage) {
       fetchUserInfo(tokenFromStorage);
