@@ -6,7 +6,11 @@ import "../../css/Articles.css";
 
 const Articles_View = () => {
   const { slug } = useParams();
+  const [user, setUser] = useState(null);
   const [article, setArticle] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  const userToken = localStorage.getItem("userToken");
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -15,19 +19,47 @@ const Articles_View = () => {
           `https://api.realworld.io/api/articles/${slug}`
         );
         setArticle(response.data.article);
+
+        // Fetch author's profile after getting the article
+        fetchAuthorProfile(response.data.article.author.username);
+        console.log(response.data.article.author.username);
       } catch (error) {
         console.error("Error fetching article:", error);
       }
     };
 
-    fetchArticle();
-  }, [slug]);
+    const fetchAuthorProfile = async (authorUsername) => {
+      try {
+        const response = await axios.get(
+          `https://api.realworld.io/api/profiles/${authorUsername}`,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+        setUser(response.data.profile);
+        setIsFollowing(response.data.profile.following);
+        console.log("authorUsername: ", authorUsername);
+      } catch (error) {
+        console.error("Error fetching author profile:", error);
+      }
+    };
+    console.log("userToken:", userToken);
 
-  if (!article) {
+    fetchArticle();
+  }, [slug, userToken]);
+
+  const handleUpdateFollow = (updatedProfile) => {
+    setUser(updatedProfile);
+    setIsFollowing(updatedProfile.following);
+  };
+
+  if (!article || !user) {
     return <div>Loading...</div>;
   }
 
-  //Format Date
+  // Format Date
   const formattedDate = new Date(article.createdAt).toLocaleDateString(
     "en-US",
     {
@@ -53,13 +85,12 @@ const Articles_View = () => {
               <span className="date">{formattedDate}</span>
             </div>
             <span>
-              <button className="btn btn-sm btn-secondary">
-                <i
-                  className="bi bi-plus-lg"
-                  style={{ marginRight: "0.4rem", fontSize: "0.75rem" }}
-                ></i>
-                Follow {article.author.username}
-              </button>
+              <FollowButton
+                key={isFollowing ? "following" : "notFollowing"}
+                profileUsername={user.username}
+                onUpdateFollow={handleUpdateFollow}
+                pageStyle="article-button"
+              />
               <button className="btn btn-sm btn-outline-danger mx-1">
                 <i className="bi bi-suit-heart-fill mx-1"></i>Favorite Article
                 (....)
@@ -80,12 +111,12 @@ const Articles_View = () => {
               <p>{article.body}</p>
             </div>
             <ul className="tag-list">
-                {article.tagList.map((tag) => (
-                  <li key={tag} className="tag-default tag-pill tag-outline">
-                    {tag}
-                  </li>
-                ))}
-              </ul>
+              {article.tagList.map((tag) => (
+                <li key={tag} className="tag-default tag-pill tag-outline">
+                  {tag}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
         <hr />
@@ -101,16 +132,15 @@ const Articles_View = () => {
               <span className="date">{formattedDate}</span>
             </div>
             <span>
-              <button className="btn btn-sm btn-outline-secondary">
-                <i
-                  className="bi bi-plus-lg"
-                  style={{ marginRight: "0.4rem", fontSize: "0.75rem" }}
-                ></i>
-                Follow {article.author.username}
-              </button>
+              <FollowButton
+                key={isFollowing ? "following" : "notFollowing"}
+                profileUsername={user.username}
+                onUpdateFollow={handleUpdateFollow}
+                pageStyle="article-button"
+              />
               <button className="btn btn-sm btn-outline-danger mx-1">
                 <i className="bi bi-suit-heart-fill mx-1"></i>Favorite Article
-                (....)
+                {article.favoritesCount}
               </button>
             </span>
             {/* IF CURRENT USER IS AUTHOR */}

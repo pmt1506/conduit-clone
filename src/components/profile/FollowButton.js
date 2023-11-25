@@ -1,78 +1,96 @@
 // FollowButton.js
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const FollowButton = ({
-  profileUsername,
-  userToken,
-  isFollowing,
-  onUpdateFollow,
-  buttonClass,
-}) => {
-  const [loading, setLoading] = useState(false);
+const FollowButton = ({ profileUsername, onUpdateFollow, pageStyle }) => {
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
+
+  const userToken = localStorage.getItem("userToken");
 
   useEffect(() => {
-    // You can add any additional logic here if needed when the component mounts or the dependencies change.
-  }, [isFollowing]);
+    const fetchFollowStatus = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.realworld.io/api/profiles/${profileUsername}`,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+        setIsFollowing(response.data.profile.following);
+      } catch (error) {
+        console.error("Error fetching follow status:", error);
+      }
+    };
 
-  const handleToggleFollow = async () => {
+    fetchFollowStatus();
+  }, [profileUsername, userToken]);
+
+  const handleFollowToggle = async () => {
     try {
-      setLoading(true);
+      setIsToggling(true);
 
-      const response = isFollowing
-        ? await axios.delete(
-            `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
-            {
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            }
-          )
-        : await axios.post(
-            `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            }
-          );
+      if (isFollowing) {
+        // If already following, perform unfollow using DELETE
+        await axios.delete(
+          `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+      } else {
+        // If not following, perform follow using POST
+        await axios.post(
+          `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+      }
 
+      // Update follow status after the toggle
+      const response = await axios.get(
+        `https://api.realworld.io/api/profiles/${profileUsername}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
       onUpdateFollow(response.data.profile);
     } catch (error) {
       console.error("Error toggling follow:", error);
     } finally {
-      setLoading(false);
+      setIsToggling(false);
     }
   };
 
   return (
-    <div>
-      <button
-        className={`btn btn-sm ${buttonClass} action-btn`}
-        style={{ float: "right", marginRight: "10px" }}
-        onClick={handleToggleFollow}
-        disabled={loading}
-      >
-        {isFollowing ? (
-          <>
-            <i
-              className="bi bi-x-lg"
-              style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-            ></i>
-            Unfollow {profileUsername}
-          </>
-        ) : (
-          <>
-            <i
-              className="bi bi-plus-lg"
-              style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-            ></i>
-            Follow {profileUsername}
-          </>
-        )}
-      </button>
-    </div>
+    <button
+      className={`btn btn-sm ${
+        isFollowing ? "btn-secondary" : "btn-outline-secondary"
+      } ${pageStyle}`}
+      onClick={handleFollowToggle}
+      disabled={isToggling}
+      style={{
+        cursor: isToggling ? "not-allowed" : "pointer",
+        height: "31px",
+        lineHeight: "21px", // Set the desired lineHeight
+      }}
+    >
+      <i
+        className={`bi ${isFollowing ? "bi-x-lg" : "bi-plus-lg"}`}
+        style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+      ></i>
+      {isFollowing ? "Unfollow" : "Follow"} {profileUsername}
+    </button>
   );
 };
 
