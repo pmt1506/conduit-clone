@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import "../../css/Profile.css";
-import FollowButton from "./FollowButton";
+import FollowButton from "../buttons/FollowButton";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
