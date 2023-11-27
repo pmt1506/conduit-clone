@@ -46,7 +46,6 @@ const Articles_View = () => {
         );
         setUser(response.data.profile);
         setIsFollowing(response.data.profile.following);
-        console.log("Is Followed: ", isFollowing);
         console.log("Is Followed: ", response.data.profile.following);
 
       } catch (error) {
