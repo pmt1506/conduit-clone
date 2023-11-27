@@ -1,0 +1,49 @@
+.article-meta_1 {
+    display: flex;
+    position: relative;
+    font-weight: 300;
+}
+
+.article-page .banner .article-meta_1 {
+    margin: 2rem 0 0 0;
+}
+
+.article-meta_1 img, .article-meta_2 img{
+    border-radius: 32px;
+}
+
+.article-meta_1 .info, .article-meta_2 .info{
+    margin: 0 1.5rem 0 0.5rem;
+    /* display: inline-block; */
+    vertical-align: middle;
+    line-height: 1rem;
+}
+
+.article-meta_1 a{
+    color: white;
+}
+
+.article-meta_1 .date, .article-meta_2 .date{
+    color: #bbb;
+    font-size: 0.8rem;
+    display: block;
+}
+
+/* Article Content */
+.article-page .article-content p {
+    font-family: 'Source Serif Pro', serif;
+    font-size: 1.3rem;
+    line-height: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.article-meta_2{
+    display: flex;
+    justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.article-meta_2 a{
+    color: #5CB85C;
+}

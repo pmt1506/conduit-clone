@@ -1,88 +1,71 @@
+// Profile.js
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import "../../css/Profile.css";
+import FollowButton from "../buttons/FollowButton";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
-  const { username: profileUsername } = useParams();
-  const userToken = sessionStorage.getItem("userToken");
   const [isFollowing, setIsFollowing] = useState(false);
 
-  useEffect(() => {
-    const fetchUserProfile = () => {
-      if (profileUsername) {
-        axios
-          .get(`https://api.realworld.io/api/profiles/${profileUsername}`)
-          .then((response) => {
-            setUser(response.data.profile);
-          })
-          .catch((error) => {
-            console.error("Error fetching user data:", error);
-          });
-      }
-    };
+  const { username: profileUsername } = useParams();
+  const userToken = localStorage.getItem("userToken");
 
-    const fetchAuthenticatedUser = () => {
-      if (userToken) {
-        axios
-          .get("https://api.realworld.io/api/user", {
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.realworld.io/api/profiles/${profileUsername}`,
+          {
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
-          })
-          .then((response) => {
-            setAuthenticatedUser(response.data.user);
-          })
-          .catch((error) => {
-            console.error("Error fetching authenticated user data:", error);
-          });
+          }
+        );
+        setUser(response.data.profile);
+        setIsFollowing(response.data.profile.following);
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
       }
     };
 
-    fetchUserProfile();
+    const fetchAuthenticatedUser = async () => {
+      try {
+        const response = await axios.get("https://api.realworld.io/api/user", {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        });
+        setAuthenticatedUser(response.data.user);
+      } catch (error) {
+        console.error("Error fetching authenticated user:", error);
+      }
+    };
+
+    fetchProfileData();
     fetchAuthenticatedUser();
   }, [profileUsername, userToken]);
 
+  const isOwnProfile =
+    authenticatedUser && user && authenticatedUser.username === user.username;
+
   useEffect(() => {
-    // Check if the authenticated user is defined and already following the profile user
-    if (authenticatedUser && user) {
-      setIsFollowing(
-        authenticatedUser.following &&
-          authenticatedUser.following.includes(user.username)
-      );
-    }
-  }, [authenticatedUser, user]);
+    console.log("Is my own profile: ", isOwnProfile);
+  }, [isOwnProfile]);
 
-  const handleFollowToggle = () => {
-    if (userToken) {
-      const followEndpoint = `https://api.realworld.io/api/profiles/${profileUsername}/follow`;
-
-      const requestConfig = {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      };
-
-      // Toggle follow status
-      if (isFollowing) {
-        // Unfollow
-        axios.delete(followEndpoint, requestConfig).then(() => {
-          setIsFollowing(false);
-        });
-      } else {
-        // Follow
-        axios.post(followEndpoint, {}, requestConfig).then(() => {
-          setIsFollowing(true);
-        });
-      }
-    }
+  const handleUpdateFollow = (updatedProfile) => {
+    setUser(updatedProfile);
+    setIsFollowing(updatedProfile.following);
   };
+
+  useEffect(() => {
+    console.log("Following: ", isFollowing);
+  }, [isFollowing]);
 
   return (
     <div className="profile-page">
-      {/* User's basic info & action buttons  */}
       <div className="user-info">
         <div className="container">
           <div
@@ -99,35 +82,31 @@ const Profile = () => {
                 <img src={user.image} alt="#" className="user-img" />
                 <h4>{user.username}</h4>
                 <p>{user.bio}</p>
-                {isFollowing ? (
-                  // Render "Unfollow" button
+                {!isOwnProfile && (
                   <div>
-                    <button
-                      className="btn btn-sm btn-outline-secondary action-btn"
-                      style={{ float: "right" }}
-                      onClick={handleFollowToggle}
-                    >
-                      <i
-                        class="bi bi-x-lg"
-                        style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                      ></i>
-                      Unfollow {profileUsername}
-                    </button>
+                    <FollowButton
+                      key={isFollowing ? "following" : "notFollowing"}
+                      profileUsername={user.username}
+                      // userToken={userToken}
+                      isFollowing={isFollowing}
+                      onUpdateFollow={handleUpdateFollow}
+                      pageStyle="profile-button"
+                    />
                   </div>
-                ) : (
-                  // Render "Follow" button
+                )}
+                {isOwnProfile && (
                   <div>
-                    <button
+                    <a
+                      href="/settings"
                       className="btn btn-sm btn-outline-secondary action-btn"
-                      style={{ float: "right" }}
-                      onClick={handleFollowToggle}
+                      style={{ float: "right", marginRight: "10px" }}
                     >
                       <i
-                        class="bi bi-plus-lg"
-                        style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                        className="bi bi-gear"
+                        style={{ marginRight: "0.15rem" }}
                       ></i>
-                      Follow {profileUsername}
-                    </button>
+                      Edit Profile Settings
+                    </a>
                   </div>
                 )}
               </>
