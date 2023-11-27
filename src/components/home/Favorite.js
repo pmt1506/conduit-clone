@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // Ensure this import is present
+import axios from "axios";
 
 const Favorite = ({ articleSlug, onUpdateFavorite, favCount }) => {
   const [isFavorited, setIsFavorited] = useState(false);
@@ -31,29 +31,42 @@ const Favorite = ({ articleSlug, onUpdateFavorite, favCount }) => {
     try {
       setIsToggling(true);
   
-      // Simulate API calls
-      await axios.delete(`https://api.realworld.io/api/articles/${articleSlug}/favorite`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      });
-      await axios.post(`https://api.realworld.io/api/articles/${articleSlug}/favorite`, null, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      });
+      if (isFavorited) {
+        await axios.delete(
+          `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+      } else {
+        await axios.post(
+          `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+      }
   
-      // Simulate updating the favorite status after the toggle
-      const updatedFavCount = isFavorited ? favCount - 1 : favCount + 1;
+      // Update favorite status after the toggle
+      const response = await axios.get(
+        `https://api.realworld.io/api/articles/${articleSlug}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
   
-      // Trigger the update in the parent component
-      onUpdateFavorite({
-        favorited: !isFavorited,
-        favoritesCount: updatedFavCount,
-      });
+      setIsFavorited(response.data.article.favorited);
+      onUpdateFavorite(response.data.article);
   
-      // Update local state
-      setIsFavorited(!isFavorited);
+      // Log whether it's favorited or not after the toggle
+      console.log(`Article ${response.data.article.favorited ? 'favorited' : 'unfavorited'}`);
     } catch (error) {
       console.error("Error toggling favorite:", error);
     } finally {

@@ -27,7 +27,6 @@ const Articles_View = () => {
         fetchAuthorProfile(response.data.article.author.username);
         //Fetch Favorited status
         setIsFavorited(response.data.article.favorited)
-        console.log(response.data.article.author.username);
         console.log("isFavorited: ", isFavorited);
       } catch (error) {
         console.error("Error fetching article:", error);

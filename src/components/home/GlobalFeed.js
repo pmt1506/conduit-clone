@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Favorite from "./Favorite";
 
-const formatDate = (dateString) => {
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(dateString).toLocaleDateString(undefined, options);
-};
-
 const GlobalFeed = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -28,6 +28,22 @@ const GlobalFeed = () => {
     fetchArticles();
   }, []);
 
+  const handleUpdateFavorite = (updatedArticle) => {
+    // Find the index of the updated article in the state
+    const updatedIndex = articles.findIndex(
+      (article) => article.slug === updatedArticle.slug
+    );
+
+    if (updatedIndex !== -1) {
+      // Update the state with the modified article
+      setArticles((prevArticles) => {
+        const newArticles = [...prevArticles];
+        newArticles[updatedIndex] = updatedArticle;
+        return newArticles;
+      });
+    }
+  };
+
   return (
     <div>
       {loading ? (
@@ -36,12 +52,18 @@ const GlobalFeed = () => {
         articles.map((article) => (
           <div key={article.slug} className="article-preview">
             <div className="article-meta">
-              {/* Use the simplified Favorite component without API calls */}
+              <a href={`/${article.author.username}`}>
+                <img src={article.author.image} alt={article.author.username} />
+              </a>
+              <div className="info">
+                <a href={`/${article.author.username}`} className="author">
+                  {article.author.username}
+                </a>
+                <span className="date">{formatDate(article.createdAt)}</span>
+              </div>
               <Favorite
-                articleSlug={article.slug} // Ensure that article.slug is defined
-                onUpdateFavorite={(updatedArticle) => {
-                  console.log("Article updated:", updatedArticle);
-                }}
+                articleSlug={article.slug}
+                onUpdateFavorite={handleUpdateFavorite}
                 favCount={article.favoritesCount}
               />
             </div>
