@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import FollowButton from "../profile/FollowButton";
+import FollowButton from "../buttons/FollowButton";
 import "../../css/Articles.css";
+import FavoriteButton from "../buttons/FavoriteButton";
 
 const Articles_View = () => {
   const { slug } = useParams();
+  const [user, setUser] = useState(null);
   const [article, setArticle] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favCount, setFavCount] = useState(0);
+
+  const userToken = localStorage.getItem("userToken");
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -15,19 +22,57 @@ const Articles_View = () => {
           `https://api.realworld.io/api/articles/${slug}`
         );
         setArticle(response.data.article);
+
+        // Fetch author's profile after getting the article
+        fetchAuthorProfile(response.data.article.author.username);
+        //Fetch Favorited status
+        setIsFavorited(response.data.article.favorited)
+        console.log(response.data.article.author.username);
+        console.log("isFavorited: ", isFavorited);
       } catch (error) {
         console.error("Error fetching article:", error);
       }
     };
 
-    fetchArticle();
-  }, [slug]);
+    const fetchAuthorProfile = async (authorUsername) => {
+      try {
+        const response = await axios.get(
+          `https://api.realworld.io/api/profiles/${authorUsername}`,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+        setUser(response.data.profile);
+        setIsFollowing(response.data.profile.following);
+        console.log("Is Followed: ", isFollowing);
+        console.log("Is Followed: ", response.data.profile.following);
 
-  if (!article) {
+      } catch (error) {
+        console.error("Error fetching author profile:", error);
+      }
+    };
+    console.log("userToken:", userToken);
+
+    fetchArticle();
+  }, [slug, userToken]);
+
+  const handleUpdateFollow = (updatedProfile) => {
+    setUser(updatedProfile);
+    setIsFollowing(updatedProfile.following);
+  };
+
+  const handleUpdateFavorite = (updatedArticle) => {
+    setArticle(updatedArticle);
+    setFavCount(updatedArticle.favoritesCount);
+  };
+
+  if (!article || !user) {
     return <div>Loading...</div>;
   }
 
-  //Format Date
+  // Format Date
   const formattedDate = new Date(article.createdAt).toLocaleDateString(
     "en-US",
     {
@@ -53,17 +98,18 @@ const Articles_View = () => {
               <span className="date">{formattedDate}</span>
             </div>
             <span>
-              <button className="btn btn-sm btn-secondary">
-                <i
-                  className="bi bi-plus-lg"
-                  style={{ marginRight: "0.4rem", fontSize: "0.75rem" }}
-                ></i>
-                Follow {article.author.username}
-              </button>
-              <button className="btn btn-sm btn-outline-danger mx-1">
-                <i className="bi bi-suit-heart-fill mx-1"></i>Favorite Article
-                (....)
-              </button>
+              <FollowButton
+                key={isFollowing ? "following" : "notFollowing"}
+                profileUsername={user.username}
+                onUpdateFollow={handleUpdateFollow}
+                pageStyle="article-button"
+              />
+              <FavoriteButton
+              key={isFavorited? "favorited" : "notFavorited"}
+              articleSlug={slug}
+              favCount={article.favoritesCount}
+              onUpdateFavorite={handleUpdateFavorite}
+              />
             </span>
             {/* IF CURRENT USER IS AUTHOR */}
             <span style={{ display: "none" }}>
@@ -80,12 +126,12 @@ const Articles_View = () => {
               <p>{article.body}</p>
             </div>
             <ul className="tag-list">
-                {article.tagList.map((tag) => (
-                  <li key={tag} className="tag-default tag-pill tag-outline">
-                    {tag}
-                  </li>
-                ))}
-              </ul>
+              {article.tagList.map((tag) => (
+                <li key={tag} className="tag-default tag-pill tag-outline">
+                  {tag}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
         <hr />
@@ -101,17 +147,18 @@ const Articles_View = () => {
               <span className="date">{formattedDate}</span>
             </div>
             <span>
-              <button className="btn btn-sm btn-outline-secondary">
-                <i
-                  className="bi bi-plus-lg"
-                  style={{ marginRight: "0.4rem", fontSize: "0.75rem" }}
-                ></i>
-                Follow {article.author.username}
-              </button>
-              <button className="btn btn-sm btn-outline-danger mx-1">
-                <i className="bi bi-suit-heart-fill mx-1"></i>Favorite Article
-                (....)
-              </button>
+              <FollowButton
+                key={isFollowing ? "following" : "notFollowing"}
+                profileUsername={user.username}
+                onUpdateFollow={handleUpdateFollow}
+                pageStyle="article-button"
+              />
+              <FavoriteButton
+              key={isFavorited? "favorited" : "notFavorited"}
+              articleSlug={slug}
+              favCount={article.favoritesCount}
+              onUpdateFavorite={handleUpdateFavorite}
+              />
             </span>
             {/* IF CURRENT USER IS AUTHOR */}
             <span style={{ display: "none" }}>
