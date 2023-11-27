@@ -7,9 +7,11 @@ const Header = () => {
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    // Get userToken from sessionStorage when the component mounts
-    const tokenFromStorage = sessionStorage.getItem("userToken");
+    // Get userToken from localStorage when the component mounts
+    const tokenFromStorage = localStorage.getItem("userToken");
     setUserToken(tokenFromStorage);
+
+    console.log("This is Token from Header: ",{tokenFromStorage});
 
     // Fetch user information if the user is logged in
     if (tokenFromStorage) {
@@ -53,7 +55,7 @@ const Header = () => {
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
                 <a className="nav-link" href="/editor">
                   <i
-                    class="bi bi-pencil-square"
+                    className="bi bi-pencil-square"
                     style={{ marginRight: "0.15rem" }}
                   ></i>
                   New Article
@@ -62,7 +64,7 @@ const Header = () => {
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
                 <a className="nav-link" href="/settings">
                   <i
-                    class="bi bi-gear-wide"
+                    className="bi bi-gear-wide"
                     style={{ marginRight: "0.15rem" }}
                   ></i>
                   Settings
@@ -87,7 +89,7 @@ const Header = () => {
                     marginRight: "0.5rem",
                   }}
                 />
-                <a className="nav-link" href={`/@${userInfo.username}`}>
+                <a className="nav-link" href={`/${userInfo.username}`}>
                   {userInfo.username}
                 </a>
               </li>

@@ -23,8 +23,8 @@ const Settings = () => {
     // Update the document title
     document.title = `Setting -- Conduit`;
 
-    // Retrieve the user token from sessionStorage
-    const userToken = sessionStorage.getItem("userToken");
+    // Retrieve the user token from localStorage
+    const userToken = localStorage.getItem("userToken");
 
     if (!userToken) {
       // If no user token, redirect to login page
@@ -78,7 +78,7 @@ const Settings = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("userToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
           },
         }
       );
@@ -141,7 +141,7 @@ const Settings = () => {
 
   const handleLogout = () => {
     // Clear session storage
-    sessionStorage.clear();
+    localStorage.clear();
     // Redirect to the login page (replace '/login' with the actual path)
     window.location.href = "/login";
   };
