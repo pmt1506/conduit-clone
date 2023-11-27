@@ -1,13 +1,81 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const YourFeed = ({ articles, loading }) => (
-  <div>
-    {/* {loading ? (
-      <div>Loading articles...</div>
-    ) : (articles.map((article) => (
-      
-    ))} */}
-  </div>
-);
+const YourFeed = ({ loading }) => {
+  const [yourFeedArticles, setYourFeedArticles] = useState([]);
+
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  useEffect(() => {
+    const fetchYourFeedArticles = async () => {
+      try {
+        const userToken = localStorage.getItem("userToken");
+        if (!userToken) {
+          // User is not logged in, do not fetch Your Feed articles
+          return;
+        }
+
+        const response = await axios.get(
+          "https://api.realworld.io/api/articles/feed",
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+        console.log(response.data.articles); 
+
+        setYourFeedArticles(response.data.articles);
+      } catch (error) {
+        console.error("Error fetching Your Feed articles:", error);
+      }
+    };
+
+    fetchYourFeedArticles();
+  }, []);
+
+  return (
+    <div>
+      {loading ? (
+        <div>Loading articles...</div>
+      ) : (
+        yourFeedArticles.map((article) => (
+          <div key={article.slug} className="article-preview">
+            <div className="article-meta">
+              <a href={`/${article.author.username}`}>
+                <img src={article.author.image} alt={article.author.username} />
+              </a>
+              <div className="info">
+                <a href={`/${article.author.username}`} className="author">
+                  {article.author.username}
+                </a>
+                <span className="date">{formatDate(article.createdAt)}</span>
+              </div>
+              {/* You can add Favorite and other components here if needed */}
+            </div>
+
+            <a href={`/article/${article.slug}`} className="preview-link">
+              <h1>{article.title}</h1>
+              <p>{article.description}</p>
+              <div>
+                <span>Read more...</span>
+                <ul className="tag-list">
+                  {article.tagList.map((tag) => (
+                    <li key={tag} className="tag-default tag-pill tag-outline">
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </a>
+          </div>
+        ))
+      )}
+    </div>
+  );
+};
 
 export default YourFeed;
