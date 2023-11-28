@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Favorite from "./Favorite";
 
-const GlobalFeed = () => {
+const GlobalFeed = ({ selectedTag }) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,9 +14,15 @@ const GlobalFeed = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await axios.get(
-          "https://api.realworld.io/api/articles"
-        );
+        setLoading(true);
+        let apiUrl = "https://api.realworld.io/api/articles";
+        
+        // If a tag is selected, add tag filtering to the API endpoint
+        if (selectedTag) {
+          apiUrl += `?tag=${selectedTag}`;
+        }
+
+        const response = await axios.get(apiUrl);
         setArticles(response.data.articles);
       } catch (error) {
         console.error("Error fetching articles:", error);
@@ -26,7 +32,7 @@ const GlobalFeed = () => {
     };
 
     fetchArticles();
-  }, []);
+  }, [selectedTag]);
 
   const handleUpdateFavorite = (updatedArticle) => {
     // Find the index of the updated article in the state

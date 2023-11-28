@@ -76,7 +76,9 @@ const Home = () => {
     console.log("Selected Tag:", tag);
     setCurrentPage(1);
     setSelectedTag(tag);
+    console.log("Selected Tag State:", selectedTag);
   };
+  
 
   return (
     <div>
@@ -116,6 +118,7 @@ const Home = () => {
               <GlobalFeed
                 articles={currentArticles}
                 loading={loadingArticles}
+                selectedTag={selectedTag}
               />
 
               {!loadingArticles && totalPages > 1 && (
