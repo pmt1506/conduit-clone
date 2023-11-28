@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import FollowButton from "../buttons/FollowButton";
+import FavoriteButton from "../buttons/FavoriteButton";
 import "../../css/Articles.css";
 
 const Articles_View = () => {
@@ -26,6 +27,7 @@ const Articles_View = () => {
         fetchAuthorProfile(response.data.article.author.username);
         setIsFavorited(response.data.article.favorited);
         setFavCount(response.data.article.favoritesCount);
+
         console.log(response.data.article.favorited);
         console.log(response.data.article.favoritesCount);
         // Fetch article's favorite count and status
@@ -99,14 +101,8 @@ const Articles_View = () => {
                 onUpdateFollow={handleUpdateFollow}
                 pageStyle="article-button"
               />
-              {/* Favorite Button logic */}
-              <button
-                className={`btn btn-sm ${
-                  isFavorited ? "btn-danger" : "btn-outline-danger"
-                } article-button`}
-              >
-                {isFavorited ? "Unfavorite" : "Favorite"} ({favCount})
-              </button>
+              {/* Favorite Button */}
+              <FavoriteButton articleSlug={article.slug} />
             </span>
             {/* IF CURRENT USER IS AUTHOR */}
             <span style={{ display: "none" }}>
@@ -150,13 +146,7 @@ const Articles_View = () => {
                 onUpdateFollow={handleUpdateFollow}
                 pageStyle="article-button"
               />
-              <button
-                className={`btn btn-sm ${
-                  isFavorited ? "btn-danger" : "btn-outline-danger"
-                } article-button`}
-              >
-                {isFavorited ? "Unfavorite" : "Favorite"} ({favCount})
-              </button>
+              <FavoriteButton articleSlug={article.slug} />
             </span>
             {/* IF CURRENT USER IS AUTHOR */}
             <span style={{ display: "none" }}>
