@@ -308,7 +308,7 @@ const Home = () => {
                       Global Feed
                     </NavLink>
                   </li>
-                  {selectedTag && selectedTag !== "Your Feed" && (
+                  {selectedTag && (
                     <li className="nav-item">
                       <a className="nav-link active" href="">
                         #{selectedTag}
@@ -318,12 +318,12 @@ const Home = () => {
                 </ul>
               </div>
 
-              {currentTab === "Your Feed" && user && (
+              {/* {currentTab === "Your Feed" && user && (
                 <YourFeed
                   articles={currentTab === "Your Feed" ? currentArticles : []}
                   loading={loadingArticles}
                 />
-              )}
+              )} */}
 
               {currentTab !== "Your Feed" && (
                 <GlobalFeed articles={currentArticles} loading={loadingArticles} />
