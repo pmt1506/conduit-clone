@@ -56,7 +56,7 @@ const Home = () => {
     const fetchArticles = async () => {
       try {
         setLoadingArticles(true);
-  
+        setArticles([]);
         // Only fetch articles for the selected tag if the current tab is "Global Feed"
         if (currentTab === "Global Feed") {
           const response = await fetch(
