@@ -18,6 +18,7 @@ const GlobalFeed = () => {
           "https://api.realworld.io/api/articles"
         );
         setArticles(response.data.articles);
+        console.log("Fetched Articles:", response.data.articles);
       } catch (error) {
         console.error("Error fetching articles:", error);
       } finally {
