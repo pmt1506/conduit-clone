@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Favorite from "./Favorite";
 
 const YourFeed = ({ loading }) => {
   const [yourFeedArticles, setYourFeedArticles] = useState([]);
@@ -37,6 +38,54 @@ const YourFeed = ({ loading }) => {
     fetchYourFeedArticles();
   }, []);
 
+  const handleUpdateFavorite = async (updatedArticle) => {
+    const userToken = localStorage.getItem("userToken");
+  
+    try {
+      // Find the index of the updated article in the state
+      const updatedIndex = yourFeedArticles.findIndex(
+        (article) => article.slug === updatedArticle.slug
+      );
+  
+      if (updatedIndex !== -1) {
+        // Update the state optimistically
+        setYourFeedArticles((prevArticles) => {
+          const newArticles = [...prevArticles];
+          newArticles[updatedIndex] = {
+            ...prevArticles[updatedIndex],
+            favorited: updatedArticle.favorited,
+            favoritesCount: updatedArticle.favoritesCount,
+          };
+          return newArticles;
+        });
+  
+        // Send a request to update the favorite status on the server
+        await axios.post(
+          `https://api.realworld.io/api/articles/${updatedArticle.slug}/favorite`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+  
+        // Fetch the updated article after the request to get the latest data
+        const response = await axios.get(`https://api.realworld.io/api/articles/${updatedArticle.slug}`);
+  
+        // Update the state with the actual response from the server
+        setYourFeedArticles((prevArticles) => {
+          const newArticles = [...prevArticles];
+          newArticles[updatedIndex] = response.data.article;
+          return newArticles;
+        });
+      }
+    } catch (error) {
+      console.error("Error updating favorite status:", error);
+    }
+  };
+  
+
   return (
     <div>
       {loading ? (
@@ -54,7 +103,11 @@ const YourFeed = ({ loading }) => {
                 </a>
                 <span className="date">{formatDate(article.createdAt)}</span>
               </div>
-              {/* You can add Favorite and other components here if needed */}
+              <Favorite
+                articleSlug={article.slug}
+                onUpdateFavorite={handleUpdateFavorite}
+                favCount={article.favoritesCount}
+              />
             </div>
 
             <a href={`/article/${article.slug}`} className="preview-link">

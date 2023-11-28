@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
 import GlobalFeed from "./GlobalFeed";
 import YourFeed from "./YourFeed";
 import Pagination from "./Pagination";
@@ -15,6 +16,7 @@ const Home = () => {
   const [selectedTag, setSelectedTag] = useState(null);
   const [user, setUser] = useState(null);
   const [currentTab, setCurrentTab] = useState("Global Feed");
+  const [totalArticles, setTotalArticles] = useState(0);
 
   useEffect(() => {
     document.title = "Home -- Conduit";
@@ -57,17 +59,46 @@ const Home = () => {
       try {
         setLoadingArticles(true);
         setArticles([]);
-        // Only fetch articles for the selected tag if the current tab is "Global Feed"
+        let apiUrl = "https://api.realworld.io/api/articles";
+  
+        // if (currentTab === "Global Feed") {
+        //   apiUrl += `?${selectedTag ? `tag=${selectedTag}&` : ""}limit=10&offset=${(currentPage - 1) * 10}`;
+        // } else if (currentTab === "Your Feed" && user) {
+        //   apiUrl = `https://api.realworld.io/api/articles/feed?limit=10&offset=${(currentPage - 1) * 10}`;
+        // }
+
         if (currentTab === "Global Feed") {
-          const response = await fetch(
-            `https://api.realworld.io/api/articles?limit=197${selectedTag ? `&tag=${selectedTag}` : ""}`
-          );
-          const data = await response.json();
-          console.log("Fetched Articles:", data.articles);
-          setArticles(data.articles);
+          apiUrl += `?${selectedTag ? `tag=${selectedTag}&` : ""}limit=10&offset=${(currentPage - 1) * 10}`;
+        } else if (currentTab === "Your Feed" && user) {
+          const userToken = localStorage.getItem("userToken");
+          apiUrl = `https://api.realworld.io/api/articles/feed?limit=10&offset=${(currentPage - 1) * 10}`;
+          
+          const response = await axios.get(apiUrl, {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          });
+          console.log("Fetched Your Feed Articles:", response.data.articles);
+
+          // Update total articles for Your Feed based on the response
+          setTotalArticles(response.data.articlesCount);
+
+          // Set the articles for Your Feed
+          setArticles(response.data.articles);
         }
+  
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        console.log("Fetched Articles:", data.articles);
+  
+        // Update total articles based on the response
+        if (currentTab === "Global Feed") {
+          setTotalArticles(data.articlesCount);
+        }
+  
+        setArticles(data.articles);
       } catch (error) {
-        console.error(`Error fetching articles for tag ${selectedTag}:`, error);
+        console.error(`Error fetching articles for tab ${selectedTag}:`, error);
       } finally {
         setLoadingArticles(false);
       }
@@ -79,11 +110,10 @@ const Home = () => {
     }
   
     fetchArticles();
-  }, [selectedTag, currentTab]);
-  
+  }, [selectedTag, currentTab, currentPage, user]);
 
-  const totalArticles = articles.length;
   const totalPages = Math.ceil(totalArticles / 10);
+  console.log("Total Pages:", totalPages);
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
   const goToPreviousPage = () => {
@@ -100,7 +130,7 @@ const Home = () => {
 
   const startIndex = (currentPage - 1) * 10;
   const endIndex = startIndex + 10;
-  const currentArticles = articles.slice(startIndex, endIndex);
+  const currentArticles = articles ? articles.slice(startIndex, endIndex) : [];
 
   const handleYourFeedClick = (e) => {
     e.preventDefault();

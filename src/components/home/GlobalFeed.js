@@ -15,6 +15,7 @@ const GlobalFeed = ({ articles: globalArticles, loading: globalLoading }) => {
     const fetchArticles = async () => {
       try {
         setLoading(globalLoading);
+        setArticles([]);
         const response = await axios.get(
           "https://api.realworld.io/api/articles"
         );
@@ -28,7 +29,7 @@ const GlobalFeed = ({ articles: globalArticles, loading: globalLoading }) => {
     };
 
     fetchArticles();
-  }, [globalArticles, globalLoading]);
+  }, [globalLoading]);
 
   const handleUpdateFavorite = async (updatedArticle) => {
     const userToken = localStorage.getItem("userToken");
