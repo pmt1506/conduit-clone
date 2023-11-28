@@ -13,7 +13,6 @@ const Home = () => {
   const [loadingArticles, setLoadingArticles] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTag, setSelectedTag] = useState(null);
-
   const [user, setUser] = useState(null);
   const [currentTab, setCurrentTab] = useState("Global Feed");
 
@@ -49,27 +48,39 @@ const Home = () => {
       }
     };
 
+    fetchUser();
+    fetchTags();
+  }, []);
+
+  useEffect(() => {
     const fetchArticles = async () => {
       try {
         setLoadingArticles(true);
-        const response = await fetch(
-          `https://api.realworld.io/api/articles?limit=197${selectedTag ? `&tag=${selectedTag}` : ""
-          }`
-        );
-        const data = await response.json();
-        console.log("Fetched Articles:", data.articles);
-        setArticles(data.articles);
+  
+        // Only fetch articles for the selected tag if the current tab is "Global Feed"
+        if (currentTab === "Global Feed") {
+          const response = await fetch(
+            `https://api.realworld.io/api/articles?limit=197${selectedTag ? `&tag=${selectedTag}` : ""}`
+          );
+          const data = await response.json();
+          console.log("Fetched Articles:", data.articles);
+          setArticles(data.articles);
+        }
       } catch (error) {
         console.error(`Error fetching articles for tag ${selectedTag}:`, error);
       } finally {
         setLoadingArticles(false);
       }
     };
-
-    fetchUser();
-    fetchTags();
+  
+    // If the current tab is "Your Feed," set the current tab to "Global Feed" when the selected tag changes
+    if (currentTab === "Your Feed" && selectedTag) {
+      setCurrentTab("Global Feed");
+    }
+  
     fetchArticles();
   }, [selectedTag, currentTab]);
+  
 
   const totalArticles = articles.length;
   const totalPages = Math.ceil(totalArticles / 10);
@@ -91,7 +102,6 @@ const Home = () => {
   const endIndex = startIndex + 10;
   const currentArticles = articles.slice(startIndex, endIndex);
 
-  // fix loading page when change feed
   const handleYourFeedClick = (e) => {
     e.preventDefault();
     setCurrentTab("Your Feed");
@@ -102,7 +112,6 @@ const Home = () => {
     setCurrentTab("Global Feed");
     setSelectedTag(null);
   };
-  //
 
   const handleTagClick = (tag) => {
     console.log("Selected Tag:", tag);
@@ -163,8 +172,6 @@ const Home = () => {
                   loading={loadingArticles}
                 />
               )}
-
-              
 
               {!loadingArticles && (
                 <GlobalFeed articles={currentArticles} loading={loadingArticles} />
