@@ -32,6 +32,7 @@ const Articles_View = () => {
         console.log(response.data.article.favoritesCount);
         // Fetch article's favorite count and status
 
+        document.title = response.data.article.title;
         //Fetch Favorited status
       } catch (error) {
         console.error("Error fetching article:", error);
