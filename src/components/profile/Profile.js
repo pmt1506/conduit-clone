@@ -76,7 +76,7 @@ const Profile = () => {
               alignItems: "center",
               textAlign: "center",
             }}
-          >
+          > 
             {user && (
               <>
                 <img src={user.image} alt="#" className="user-img" />
