@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Favorite from "./Favorite";
 
-const YourFeed = () => {
+const YourFeed = ({ currentPage, articlesPerPage }) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,7 @@ const YourFeed = () => {
         setLoading(true);
         const userToken = localStorage.getItem("userToken"); // Assuming you store the token in localStorage
         const response = await axios.get(
-          "https://api.realworld.io/api/articles/feed",
+          `https://api.realworld.io/api/articles/feed?offset=${(currentPage - 1) * articlesPerPage}`,
           {
             headers: {
               Authorization: `Bearer ${userToken}`,
@@ -33,7 +33,7 @@ const YourFeed = () => {
     };
 
     fetchArticles();
-  }, []);
+  }, [currentPage, articlesPerPage]);
 
   const handleUpdateFavorite = (updatedArticle) => {
     // Find the index of the updated article in the state

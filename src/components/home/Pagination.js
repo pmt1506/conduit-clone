@@ -1,12 +1,6 @@
-import React from "react";
+import React from 'react';
 
-const Pagination = ({
-  currentPage,
-  totalPages,
-  handlePageChange,
-  goToPreviousPage,
-  goToNextPage,
-}) => (
+const Pagination = ({ currentPage, totalPages, handlePageChange, goToPreviousPage, goToNextPage }) => (
   <ul className="pagination mt-4">
     <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
       <button className="page-link" onClick={goToPreviousPage}>
@@ -26,7 +20,9 @@ const Pagination = ({
         </button>
       </li>
     ))}
-    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+    <li
+      className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
+    >
       <button className="page-link" onClick={goToNextPage}>
         {">"}
       </button>

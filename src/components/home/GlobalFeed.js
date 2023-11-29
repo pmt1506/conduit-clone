@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Favorite from "./Favorite";
 
-const GlobalFeed = ({ selectedTag }) => {
+const GlobalFeed = ({ selectedTag}) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,7 +16,7 @@ const GlobalFeed = ({ selectedTag }) => {
       try {
         setLoading(true);
         let apiUrl = "https://api.realworld.io/api/articles";
-        
+
         // If a tag is selected, add tag filtering to the API endpoint
         if (selectedTag) {
           apiUrl += `?tag=${selectedTag}`;

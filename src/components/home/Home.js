@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GlobalFeed from "./GlobalFeed";
 import YourFeed from "./YourFeed";
-import Pagination from "./Pagination";
 import Tags from "./Tags";
 import "../../css/Home.css";
 
@@ -9,14 +8,11 @@ const Home = () => {
   const userToken = localStorage.getItem("userToken");
 
   const [feedStatus, setFeedStatus] = useState(userToken ? "your" : "global");
-
   const [tags, setTags] = useState([]);
   const [articles, setArticles] = useState([]);
   const [loadingTags, setLoadingTags] = useState(true);
   const [loadingArticles, setLoadingArticles] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedTag, setSelectedTag] = useState(null);
-  const articlesPerPage = 10;
 
   useEffect(() => {
     document.title = "Home -- Conduit";
@@ -36,17 +32,18 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch articles when selectedTag or currentPage changes
+    // Fetch articles when selectedTag changes
     const fetchArticles = async () => {
       try {
         setLoadingArticles(true);
         const response = await fetch(
           `https://api.realworld.io/api/articles?limit=197${
             selectedTag ? `&tag=${selectedTag}` : ""
-          }&offset=${(currentPage - 1) * articlesPerPage}`
+          }`
         );
         const data = await response.json();
         setArticles(data.articles);
+        console.log("Total Articles:", data.articles.length);
       } catch (error) {
         console.error(`Error fetching articles for tag ${selectedTag}:`, error);
       } finally {
@@ -54,38 +51,16 @@ const Home = () => {
       }
     };
     fetchArticles();
-  }, [selectedTag, currentPage]);
-
-  const totalArticles = articles.length;
-  const totalPages = Math.ceil(totalArticles / articlesPerPage);
-
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
-  };
-
-  const startIndex = (currentPage - 1) * articlesPerPage;
-  const endIndex = startIndex + articlesPerPage;
-  const currentArticles = articles.slice(startIndex, endIndex);
+  }, [selectedTag]);
 
   const handleTagClick = (tag) => {
     console.log("Selected Tag:", tag);
-    setCurrentPage(1);
     setSelectedTag(tag);
   };
 
   const handleFeedStatusChange = (newFeedStatus) => {
     setFeedStatus(newFeedStatus);
     setSelectedTag(null); // Reset selected tag when changing feed status
-    setCurrentPage(1); // Reset current page to 1 when changing feed status
   };
 
   return (
@@ -142,25 +117,12 @@ const Home = () => {
               </div>
 
               {feedStatus === "your" ? (
-                <YourFeed
-                  articles={currentArticles}
-                  loading={loadingArticles}
-                />
+                <YourFeed loading={loadingArticles} />
               ) : (
                 <GlobalFeed
-                  articles={currentArticles}
+                  articles={articles}
                   loading={loadingArticles}
                   selectedTag={selectedTag}
-                />
-              )}
-
-              {!loadingArticles && totalPages > 1 && (
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  handlePageChange={handlePageChange}
-                  goToPreviousPage={goToPreviousPage}
-                  goToNextPage={goToNextPage}
                 />
               )}
             </div>
