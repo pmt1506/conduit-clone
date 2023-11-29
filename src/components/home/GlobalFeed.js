@@ -1,37 +1,46 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Favorite from "./Favorite";
+import Pagination from "./Pagination";
 
-const GlobalFeed = ({ selectedTag}) => {
+const GlobalFeed = ({ selectedTag }) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Assuming you have a reasonable value for articlesPerPage
+  const articlesPerPage = 10;
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        setLoading(true);
-        let apiUrl = "https://api.realworld.io/api/articles";
+  const fetchArticles = async (offset) => {
+    try {
+      setLoading(true);
+      let apiUrl = `https://api.realworld.io/api/articles?limit=${articlesPerPage}&offset=${offset}`;
 
-        // If a tag is selected, add tag filtering to the API endpoint
-        if (selectedTag) {
-          apiUrl += `?tag=${selectedTag}`;
-        }
-
-        const response = await axios.get(apiUrl);
-        setArticles(response.data.articles);
-      } catch (error) {
-        console.error("Error fetching articles:", error);
-      } finally {
-        setLoading(false);
+      // If a tag is selected, add tag filtering to the API endpoint
+      if (selectedTag) {
+        apiUrl += `&tag=${selectedTag}`;
       }
-    };
 
-    fetchArticles();
+      const response = await axios.get(apiUrl);
+      setArticles(response.data.articles);
+
+      // Calculate total pages based on the total articles and articles per page
+      setTotalPages(Math.ceil(response.data.articlesCount / articlesPerPage));
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchArticles(0); // Initial fetch with offset 0
   }, [selectedTag]);
 
   const handleUpdateFavorite = (updatedArticle) => {
@@ -47,6 +56,24 @@ const GlobalFeed = ({ selectedTag}) => {
         newArticles[updatedIndex] = updatedArticle;
         return newArticles;
       });
+    }
+  };
+
+  const handlePageChange = (pageNumber) => {
+    const newOffset = (pageNumber - 1) * articlesPerPage;
+    setCurrentPage(pageNumber);
+    fetchArticles(newOffset);
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      handlePageChange(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      handlePageChange(currentPage + 1);
     }
   };
 
@@ -91,6 +118,14 @@ const GlobalFeed = ({ selectedTag}) => {
           </div>
         ))
       )}
+      {/* Add Pagination component here */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        handlePageChange={handlePageChange}
+        goToPreviousPage={goToPreviousPage}
+        goToNextPage={goToNextPage}
+      />
     </div>
   );
 };
