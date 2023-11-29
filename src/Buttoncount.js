@@ -1,117 +1,109 @@
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "../css/Layout.css";
+import { useNavigate, useLocation } from "react-router-dom";
+import "../css/Login.css";
 
 const Buttoncount = () => {
-  const [userToken, setUserToken] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  // Use useEffect to check for state parameters on component mount
   useEffect(() => {
-    // Get userToken from localStorage when the component mounts
-    const tokenFromStorage = localStorage.getItem("userToken");
-    setUserToken(tokenFromStorage);
+    // Update the document title
+    document.title = `Login -- Conduit`;
 
-    console.log("This is Token from Header: ",{tokenFromStorage});
+    const { state } = location;
 
-    // Fetch user information if the user is logged in
-    if (tokenFromStorage) {
-      fetchUserInfo(tokenFromStorage);
+    if (state && state.email && state.password) {
+      // Autofill email and password fields
+      setEmail(state.email);
+      setPassword(state.password);
     }
-  }, []); // Empty dependency array ensures the effect runs only once when the component mounts
+  }, [location]);
 
-  const fetchUserInfo = async (token) => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    // Log email and password before making the API call
+    console.log("Email:", email);
+    console.log("Password:", password);
+
     try {
-      const response = await axios.get("https://api.realworld.io/api/user", {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
+      const response = await axios.post(
+        "https://api.realworld.io/api/users/login",
+        {
+          user: {
+            email,
+            password,
+          },
+        }
+      );
 
-      // Assuming the API returns user information
-      const userData = response.data.user;
+      // Assuming the API returns a user object upon successful login
+      const user = response.data.user;
 
-      // Set user information in state
-      setUserInfo(userData);
+      // Store user token in localStorage
+      localStorage.setItem("userToken", user.token);
+
+      // Redirect to home page after successful login
+      navigate("/");
+
+      // Reload the page after redirecting (this may help with header errors)
+      window.location.reload();
     } catch (error) {
-      console.error("Error fetching user information:", error);
+      setError("Invalid email or password. Please try again.");
     }
   };
 
   return (
-    <nav className="navbar navbar-light">
-      <div className="container">
-        <a className="navbar-brand" href="/">
-          conduit
-        </a>
-        <ul className="nav navbar-nav flex-row ml-auto">
-          <li className="nav-item">
-            <a className="nav-link active" href="/">
-              Home
+    <div className="container page">
+      <div className="row">
+        <div className="offset-md-3 col-xs-12 login-body">
+          <h1 className="text-center">Sign in</h1>
+          <p className="text-center">
+            <a
+              href="/register"
+              style={{ textDecoration: "none", color: "#5CB85C" }}
+            >
+              Need an account?
             </a>
-          </li>
-          {userToken && userInfo ? (
-            // Display this content when user is logged in
-            <>
-              <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <a className="nav-link" href="/editor">
-                  <i
-                    className="bi bi-pencil-square"
-                    style={{ marginRight: "0.15rem" }}
-                  ></i>
-                  New Article
-                </a>
-              </li>
-              <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <a className="nav-link" href="/settings">
-                  <i
-                    className="bi bi-gear-wide"
-                    style={{ marginRight: "0.15rem" }}
-                  ></i>
-                  Settings
-                </a>
-              </li>
-              <li
-                className="nav-item"
-                style={{
-                  marginLeft: "1rem",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                {/* Display user image and username */}
-                <img
-                  src={userInfo.image}
-                  alt="UserImg"
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    marginRight: "0.5rem",
-                  }}
-                />
-                <a className="nav-link" href={`/${userInfo.username}`}>
-                  {userInfo.username}
-                </a>
-              </li>
-            </>
-          ) : (
-            // Display this content when user is not logged in
-            <>
-              <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <a className="nav-link" href="/login">
-                  Sign in
-                </a>
-              </li>
-              <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <a className="nav-link" href="/register">
-                  Sign up
-                </a>
-              </li>
-            </>
-          )}
-        </ul>
+          </p>
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <input
+                type="email"
+                placeholder="Email"
+                className="form-control form-control-lg"
+                style={{ color: "#55595c" }}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <input
+                type="password"
+                placeholder="Password"
+                className="form-control form-control-lg"
+                style={{ color: "#55595c" }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <div className="form-group">
+              <button type="submit" className="btn btn-success">
+                Sign in
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </nav>
+    </div>
   );
 };
 
