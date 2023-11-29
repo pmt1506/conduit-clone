@@ -82,7 +82,7 @@ const GlobalFeed = ({ selectedTag }) => {
   return (
     <div>
       {loading ? (
-        <div>Loading articles...</div>
+        <div className="mt-3">Loading articles...</div>
       ) : (
         <>
           {articles.length > 0 ? (

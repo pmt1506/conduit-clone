@@ -3,7 +3,6 @@ import axios from "axios";
 import Favorite from "./Favorite";
 import Pagination from "./Pagination";
 
-// ... (imports and other code)
 
 const YourFeed = () => {
   const [articles, setArticles] = useState([]);
@@ -79,7 +78,7 @@ const YourFeed = () => {
   return (
     <div>
       {loading ? (
-        <div>Loading articles...</div>
+        <div className="mt-3">Loading articles...</div>
       ) : (
         <>
           {articles.length > 0 ? (
