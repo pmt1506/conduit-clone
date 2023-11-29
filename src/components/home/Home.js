@@ -6,6 +6,10 @@ import Tags from "./Tags";
 import "../../css/Home.css";
 
 const Home = () => {
+  const userToken = localStorage.getItem("userToken");
+
+  const [feedStatus, setFeedStatus] = useState(userToken ? "your" : "global");
+
   const [tags, setTags] = useState([]);
   const [articles, setArticles] = useState([]);
   const [loadingTags, setLoadingTags] = useState(true);
@@ -32,14 +36,14 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch articles when selectedTag changes
+    // Fetch articles when selectedTag or currentPage changes
     const fetchArticles = async () => {
       try {
         setLoadingArticles(true);
         const response = await fetch(
           `https://api.realworld.io/api/articles?limit=197${
             selectedTag ? `&tag=${selectedTag}` : ""
-          }`
+          }&offset=${(currentPage - 1) * articlesPerPage}`
         );
         const data = await response.json();
         setArticles(data.articles);
@@ -50,7 +54,7 @@ const Home = () => {
       }
     };
     fetchArticles();
-  }, [selectedTag]);
+  }, [selectedTag, currentPage]);
 
   const totalArticles = articles.length;
   const totalPages = Math.ceil(totalArticles / articlesPerPage);
@@ -76,9 +80,13 @@ const Home = () => {
     console.log("Selected Tag:", tag);
     setCurrentPage(1);
     setSelectedTag(tag);
-    console.log("Selected Tag State:", selectedTag);
   };
-  
+
+  const handleFeedStatusChange = (newFeedStatus) => {
+    setFeedStatus(newFeedStatus);
+    setSelectedTag(null); // Reset selected tag when changing feed status
+    setCurrentPage(1); // Reset current page to 1 when changing feed status
+  };
 
   return (
     <div>
@@ -96,30 +104,55 @@ const Home = () => {
               <div className="feed-toggle">
                 <ul className="nav nav-pills outline-active">
                   <li className="nav-item">
-                    <a
-                      className={`nav-link ${!selectedTag ? "active" : ""}`}
-                      href=""
-                      onClick={() => setSelectedTag(null)}
-                      style={{ color: "#aaa" }}
+                    <div
+                      className={`nav-link ${
+                        feedStatus === "your" ? "active" : ""
+                      }`}
+                      style={{ cursor: "pointer", color: "#aaa" }}
+                      onClick={() => handleFeedStatusChange("your")}
+                    >
+                      Your Feed
+                    </div>
+                  </li>
+                  <li className="nav-item">
+                    <div
+                      className={`nav-link ${
+                        !selectedTag && feedStatus !== "your" ? "active" : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedTag(null);
+                        handleFeedStatusChange("global");
+                      }}
+                      style={{ color: "#aaa", cursor: "pointer" }}
                     >
                       Global Feed
-                    </a>
+                    </div>
                   </li>
                   {selectedTag && (
                     <li className="nav-item">
-                      <a className="nav-link active" href="">
+                      <div
+                        className="nav-link active"
+                        style={{ cursor: "pointer" }}
+                      >
                         #{selectedTag}
-                      </a>
+                      </div>
                     </li>
                   )}
                 </ul>
               </div>
 
-              <GlobalFeed
-                articles={currentArticles}
-                loading={loadingArticles}
-                selectedTag={selectedTag}
-              />
+              {feedStatus === "your" ? (
+                <YourFeed
+                  articles={currentArticles}
+                  loading={loadingArticles}
+                />
+              ) : (
+                <GlobalFeed
+                  articles={currentArticles}
+                  loading={loadingArticles}
+                  selectedTag={selectedTag}
+                />
+              )}
 
               {!loadingArticles && totalPages > 1 && (
                 <Pagination
