@@ -3,6 +3,8 @@ import axios from "axios";
 import Favorite from "./Favorite";
 import Pagination from "./Pagination";
 
+// ... (imports and other code)
+
 const YourFeed = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -79,44 +81,55 @@ const YourFeed = () => {
       {loading ? (
         <div>Loading articles...</div>
       ) : (
-        articles.map((article) => (
-          <div key={article.slug} className="article-preview">
-            <div className="article-meta">
-              <a href={`/${article.author.username}`}>
-                <img src={article.author.image} alt={article.author.username} />
-              </a>
-              <div className="info">
-                <a href={`/${article.author.username}`} className="author">
-                  {article.author.username}
+        <>
+          {articles.length > 0 ? (
+            articles.map((article) => (
+              <div key={article.slug} className="article-preview">
+                <div className="article-meta">
+                  <a href={`/${article.author.username}`}>
+                    <img
+                      src={article.author.image}
+                      alt={article.author.username}
+                    />
+                  </a>
+                  <div className="info">
+                    <a href={`/${article.author.username}`} className="author">
+                      {article.author.username}
+                    </a>
+                    <span className="date">
+                      {formatDate(article.createdAt)}
+                    </span>
+                  </div>
+                  <Favorite
+                    articleSlug={article.slug}
+                    onUpdateFavorite={handleUpdateFavorite}
+                    favCount={article.favoritesCount}
+                  />
+                </div>
+
+                <a href={`/article/${article.slug}`} className="preview-link">
+                  <h1>{article.title}</h1>
+                  <p>{article.description}</p>
+                  <div>
+                    <span>Read more...</span>
+                  </div>
                 </a>
-                <span className="date">{formatDate(article.createdAt)}</span>
               </div>
-              <Favorite
-                articleSlug={article.slug}
-                onUpdateFavorite={handleUpdateFavorite}
-                favCount={article.favoritesCount}
-              />
-            </div>
-
-            <a href={`/article/${article.slug}`} className="preview-link">
-              <h1>{article.title}</h1>
-              <p>{article.description}</p>
-              <div>
-                <span>Read more...</span>
-              </div>
-            </a>
-          </div>
-        ))
+            ))
+          ) : (
+            <div>No articles found</div>
+          )}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              handlePageChange={handlePageChange}
+              goToPreviousPage={goToPreviousPage}
+              goToNextPage={goToNextPage}
+            />
+          )}
+        </>
       )}
-
-      {/* Add Pagination component here */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages} // Assuming articles.length is the total count
-        handlePageChange={handlePageChange}
-        goToPreviousPage={goToPreviousPage}
-        goToNextPage={goToNextPage}
-      />
     </div>
   );
 };

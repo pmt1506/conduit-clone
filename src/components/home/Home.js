@@ -81,9 +81,9 @@ const Home = () => {
                   <li className="nav-item">
                     <div
                       className={`nav-link ${
-                        feedStatus === "your" ? "active" : ""
+                        !selectedTag && feedStatus === "your" ? "active" : ""
                       }`}
-                      style={{ cursor: "pointer", color: "#aaa" }}
+                      style={{ cursor: "pointer", color: "#555" }}
                       onClick={() => handleFeedStatusChange("your")}
                     >
                       Your Feed
@@ -98,7 +98,7 @@ const Home = () => {
                         setSelectedTag(null);
                         handleFeedStatusChange("global");
                       }}
-                      style={{ color: "#aaa", cursor: "pointer" }}
+                      style={{ color: "#555", cursor: "pointer" }}
                     >
                       Global Feed
                     </div>
@@ -117,7 +117,15 @@ const Home = () => {
               </div>
 
               {feedStatus === "your" ? (
-                <YourFeed loading={loadingArticles} />
+                selectedTag !== null ? (
+                  <GlobalFeed
+                    articles={articles}
+                    loading={loadingArticles}
+                    selectedTag={selectedTag}
+                  />
+                ) : (
+                  <YourFeed loading={loadingArticles} />
+                )
               ) : (
                 <GlobalFeed
                   articles={articles}
