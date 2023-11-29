@@ -99,6 +99,12 @@ const Buttoncount = () => {
               <button type="submit" className="btn btn-success">
                 Sign in
               </button>
+              <button type="submit" className="btn btn-success">
+                Sign out
+              </button>
+              <button type="submit" className="btn btn-success">
+                Sign up
+              </button>
             </div>
           </form>
         </div>
