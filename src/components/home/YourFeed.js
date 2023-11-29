@@ -111,6 +111,16 @@ const YourFeed = () => {
                   <p>{article.description}</p>
                   <div>
                     <span>Read more...</span>
+                    <ul className="tag-list">
+                      {article.tagList.map((tag) => (
+                        <li
+                          key={tag}
+                          className="tag-default tag-pill tag-outline"
+                        >
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </a>
               </div>
