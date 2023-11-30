@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import axios from "axios";
 import GlobalFeed from "./GlobalFeed";
 import YourFeed from "./YourFeed";
-import Pagination from "./Pagination";
 import Tags from "./Tags";
 import "../../css/Home.css";
 
@@ -11,12 +10,10 @@ const Home = () => {
   const userToken = localStorage.getItem("userToken");
 
   const [feedStatus, setFeedStatus] = useState(userToken ? "your" : "global");
-
   const [tags, setTags] = useState([]);
   const [articles, setArticles] = useState([]);
   const [loadingTags, setLoadingTags] = useState(true);
   const [loadingArticles, setLoadingArticles] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedTag, setSelectedTag] = useState(null);
   const [user, setUser] = useState(null);
   const [currentTab, setCurrentTab] = useState("Global Feed");
@@ -59,14 +56,14 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch articles when selectedTag or currentPage changes
+    // Fetch articles when selectedTag changes
     const fetchArticles = async () => {
       try {
         setLoadingArticles(true);
         const response = await fetch(
           `https://api.realworld.io/api/articles?limit=197${
             selectedTag ? `&tag=${selectedTag}` : ""
-          }&offset=${(currentPage - 1) * articlesPerPage}`
+          }`
         );
         const data = await response.json();
         console.log("Fetched Articles:", data.articles);
@@ -90,60 +87,29 @@ const Home = () => {
     }
   
     fetchArticles();
-  }, [selectedTag, currentPage]);
-
-  const totalPages = Math.ceil(totalArticles / 10);
-  console.log("Total Pages:", totalPages);
-
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
-  };
-
-  const startIndex = (currentPage - 1) * 10;
-  const endIndex = startIndex + 10;
-  const currentArticles = articles ? articles.slice(startIndex, endIndex) : [];
-
-  const handleYourFeedClick = (e) => {
-    e.preventDefault();
-    setCurrentTab("Your Feed");
-    setSelectedTag(null);
-  };
-
-  const handleGlobalFeedClick = () => {
-    setCurrentTab("Global Feed");
-    setSelectedTag(null);
-  };
+  }, [selectedTag]);
 
   const handleTagClick = (tag) => {
     console.log("Selected Tag:", tag);
-    setCurrentPage(1);
     setSelectedTag(tag);
   };
 
   const handleFeedStatusChange = (newFeedStatus) => {
     setFeedStatus(newFeedStatus);
     setSelectedTag(null); // Reset selected tag when changing feed status
-    setCurrentPage(1); // Reset current page to 1 when changing feed status
   };
 
   return (
     <div>
       <div className="home-page">
-        <div className="banner">
-          <div className="container">
-            <h1 className="logo-font">conduit</h1>
-            <p>A place to share your knowledge.</p>
+        {!userToken && (
+          <div className="banner">
+            <div className="container">
+              <h1 className="logo-font">conduit</h1>
+              <p>A place to share your knowledge.</p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="container page">
           <div className="row">
@@ -163,26 +129,30 @@ const Home = () => {
                     </li>
                   )}
                   <li className="nav-item">
-                    <div
-                      className={`nav-link ${
-                        feedStatus === "your" ? "active" : ""
-                      }`}
-                      style={{ cursor: "pointer", color: "#aaa" }}
-                      onClick={() => handleFeedStatusChange("your")}
-                    >
-                      Your Feed
-                    </div>
+                    {userToken && (
+                      <div
+                        className={`nav-link ${
+                          !selectedTag && feedStatus === "your" ? "active" : ""
+                        }`}
+                        style={{ cursor: "pointer", color: "#555" }}
+                        onClick={() => handleFeedStatusChange("your")}
+                      >
+                        Your Feed
+                      </div>
+                    )}
                   </li>
                   <li className="nav-item">
                     <div
                       className={`nav-link ${
-                        !selectedTag && feedStatus !== "your" ? "active" : ""
+                        (!selectedTag && feedStatus !== "your") || !userToken
+                          ? "active"
+                          : ""
                       }`}
                       onClick={() => {
                         setSelectedTag(null);
                         handleFeedStatusChange("global");
                       }}
-                      style={{ color: "#aaa", cursor: "pointer" }}
+                      style={{ color: "#555", cursor: "pointer" }}
                     >
                       Global Feed
                     </div>
@@ -201,25 +171,20 @@ const Home = () => {
               </div>
 
               {feedStatus === "your" ? (
-                <YourFeed
-                  articles={currentArticles}
-                  loading={loadingArticles}
-                />
+                selectedTag !== null ? (
+                  <GlobalFeed
+                    articles={articles}
+                    loading={loadingArticles}
+                    selectedTag={selectedTag}
+                  />
+                ) : (
+                  <YourFeed loading={loadingArticles} />
+                )
               ) : (
                 <GlobalFeed
-                  articles={currentArticles}
+                  articles={articles}
                   loading={loadingArticles}
                   selectedTag={selectedTag}
-                />
-              )}
-
-              {!loadingArticles && totalPages > 1 && (
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  handlePageChange={handlePageChange}
-                  goToPreviousPage={goToPreviousPage}
-                  goToNextPage={goToNextPage}
                 />
               )}
             </div>
