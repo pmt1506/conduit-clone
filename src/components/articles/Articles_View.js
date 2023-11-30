@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import FollowButton from "../buttons/FollowButton";
 import FavoriteButton from "../buttons/FavoriteButton";
+import "../../css/Articles.css"
 import Comment from "./Comment";
 import axios from "axios";
 
