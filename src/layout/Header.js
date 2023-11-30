@@ -99,14 +99,14 @@ const Header = () => {
             // Display this content when user is not logged in
             <>
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <NavLink className="nav-link" to="/login">
+                <NavLink className="nav-link" href="/login">
                   Sign in
                 </NavLink>
               </li>
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <NavLink className="nav-link" to="/register">
+                <a className="nav-link" href="/register">
                   Sign up
-                </NavLink>
+                </a>
               </li>
             </>
           )}
