@@ -101,6 +101,12 @@
     color: #5CB85C;
 }
 
+.card .mod-options {
+    float: right;
+    color: #333;
+    font-size: 1rem;
+}
+
 a:hover{
     text-decoration: underline !important;
 }
@@ -110,4 +116,12 @@ a:hover{
     vertical-align: middle;
     margin-left: 5px;
     color: #bbb;
+}
+
+.mod-options{
+    color: darkgray !important;
+    cursor: pointer;
+}
+.mod-options i:hover{
+    color: #333
 }

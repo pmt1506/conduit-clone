@@ -28,6 +28,9 @@ const Comment = ({ comment, onReply, fetchComments }) => {
                 {/* <button>
                     Delete here
                 </button> */}
+                <span class="mod-options">
+                    <i class="bi bi-trash3-fill"></i>
+                </span>
             </div>
         </div>
     );
