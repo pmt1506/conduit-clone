@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../css/Layout.css";
+import { NavLink } from "react-router-dom";
 
 const Header = () => {
   const [userToken, setUserToken] = useState(null);
@@ -11,7 +12,7 @@ const Header = () => {
     const tokenFromStorage = localStorage.getItem("userToken");
     setUserToken(tokenFromStorage);
 
-    console.log("This is Token from Header: ",{tokenFromStorage});
+    console.log("This is Token from Header: ", { tokenFromStorage });
 
     // Fetch user information if the user is logged in
     if (tokenFromStorage) {
@@ -45,30 +46,30 @@ const Header = () => {
         </a>
         <ul className="nav navbar-nav flex-row ml-auto">
           <li className="nav-item">
-            <a className="nav-link active" href="/">
+            <NavLink className="nav-link" exact to="/">
               Home
-            </a>
+            </NavLink>
           </li>
           {userToken && userInfo ? (
             // Display this content when user is logged in
             <>
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <a className="nav-link" href="/editor">
+                <NavLink className="nav-link" to="/editor">
                   <i
                     className="bi bi-pencil-square"
                     style={{ marginRight: "0.15rem" }}
                   ></i>
                   New Article
-                </a>
+                </NavLink>
               </li>
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <a className="nav-link" href="/settings">
+                <NavLink className="nav-link" to="/settings">
                   <i
                     className="bi bi-gear-wide"
                     style={{ marginRight: "0.15rem" }}
                   ></i>
                   Settings
-                </a>
+                </NavLink>
               </li>
               <li
                 className="nav-item"
