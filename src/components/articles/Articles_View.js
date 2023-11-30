@@ -1,76 +1,97 @@
+// Articles_View.js
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import FollowButton from "../buttons/FollowButton";
-import "../../css/Articles.css";
 import FavoriteButton from "../buttons/FavoriteButton";
+import Comment from "./Comment";
+import axios from "axios";
 
 const Articles_View = () => {
-  const { slug } = useParams();
   const [user, setUser] = useState(null);
   const [article, setArticle] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [favCount, setFavCount] = useState(0);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
 
   const userToken = localStorage.getItem("userToken");
+  const { slug } = useParams();
 
   useEffect(() => {
-    const fetchArticle = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
+        const articleResponse = await axios.get(
           `https://api.realworld.io/api/articles/${slug}`
         );
-        setArticle(response.data.article);
+        setArticle(articleResponse.data.article);
 
-        // Fetch author's profile after getting the article
-        fetchAuthorProfile(response.data.article.author.username);
-        //Fetch Favorited status
-        setIsFavorited(response.data.article.favorited)
-        console.log("isFavorited: ", isFavorited);
-      } catch (error) {
-        console.error("Error fetching article:", error);
-      }
-    };
-
-    const fetchAuthorProfile = async (authorUsername) => {
-      try {
-        const response = await axios.get(
-          `https://api.realworld.io/api/profiles/${authorUsername}`,
+        const authorProfileResponse = await axios.get(
+          `https://api.realworld.io/api/profiles/${articleResponse.data.article.author.username}`,
           {
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
           }
         );
-        setUser(response.data.profile);
-        setIsFollowing(response.data.profile.following);
-        console.log("Is Followed: ", response.data.profile.following);
+        setUser(authorProfileResponse.data.profile);
+        setIsFollowing(authorProfileResponse.data.profile.following);
+
+        fetchComments(); // Move the comment fetching logic here
 
       } catch (error) {
-        console.error("Error fetching author profile:", error);
+        console.error("Error fetching data:", error);
       }
     };
-    console.log("userToken:", userToken);
 
-    fetchArticle();
+    fetchData();
   }, [slug, userToken]);
+
+  const handleCommentChange = (event) => {
+    setNewComment(event.target.value);
+  };
+
+  const handleCommentSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await axios.post(
+        `https://api.realworld.io/api/articles/${slug}/comments`,
+        { comment: { body: newComment } },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+
+      setComments([...comments, response.data.comment]);
+      setNewComment("");
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    }
+  };
 
   const handleUpdateFollow = (updatedProfile) => {
     setUser(updatedProfile);
     setIsFollowing(updatedProfile.following);
   };
 
-  const handleUpdateFavorite = (updatedArticle) => {
-    setArticle(updatedArticle);
-    setFavCount(updatedArticle.favoritesCount);
+  const fetchComments = async () => {
+    try {
+      const commentsResponse = await axios.get(
+        `https://api.realworld.io/api/articles/${slug}/comments`
+      );
+      setComments(commentsResponse.data.comments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
   };
 
   if (!article || !user) {
     return <div>Loading...</div>;
   }
 
-  // Format Date
   const formattedDate = new Date(article.createdAt).toLocaleDateString(
     "en-US",
     {
@@ -102,17 +123,7 @@ const Articles_View = () => {
                 onUpdateFollow={handleUpdateFollow}
                 pageStyle="article-button"
               />
-              <FavoriteButton
-              key={isFavorited? "favorited" : "notFavorited"}
-              articleSlug={slug}
-              favCount={article.favoritesCount}
-              onUpdateFavorite={handleUpdateFavorite}
-              />
-            </span>
-            {/* IF CURRENT USER IS AUTHOR */}
-            <span style={{ display: "none" }}>
-              <button>Edit</button>
-              <button>Delete</button>
+              <FavoriteButton articleSlug={article.slug} />
             </span>
           </div>
         </div>
@@ -151,22 +162,34 @@ const Articles_View = () => {
                 onUpdateFollow={handleUpdateFollow}
                 pageStyle="article-button"
               />
-              <FavoriteButton
-              key={isFavorited? "favorited" : "notFavorited"}
-              articleSlug={slug}
-              favCount={article.favoritesCount}
-              onUpdateFavorite={handleUpdateFavorite}
-              />
-            </span>
-            {/* IF CURRENT USER IS AUTHOR */}
-            <span style={{ display: "none" }}>
-              <button>Edit</button>
-              <button>Delete</button>
+              <FavoriteButton articleSlug={article.slug} />
             </span>
           </div>
-          {/* Comment Section */}
           <div className="row">
-            <div className="col-md-8 offset-md-2">Comment</div>
+            <div className="col-md-8 offset-md-2">
+              <form onSubmit={handleCommentSubmit}>
+                <div className="form-group">
+                  <textarea
+                    className="form-control"
+                    placeholder="Add your comment..."
+                    value={newComment}
+                    onChange={handleCommentChange}
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary">
+                  Add Comment
+                </button>
+              </form>
+              <div className="comments">
+                {comments.map((comment) => (
+                  <Comment
+                    key={comment.id}
+                    comment={comment}
+                    fetchComments={fetchComments}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
