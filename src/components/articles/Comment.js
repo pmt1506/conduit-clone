@@ -7,7 +7,7 @@ const Comment = ({ comment, onReply, fetchComments }) => {
 
 
     return (
-        <div key={comment.id} className="card">
+        <div key={comment.id} className="comment-form card">
             <div class="card-block">
                 <div class="form-control" rows="3">{comment.body}</div>
             </div>
