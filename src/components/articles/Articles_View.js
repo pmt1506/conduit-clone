@@ -25,18 +25,18 @@ const Articles_View = () => {
         const articleResponse = await axios.get(
           `https://api.realworld.io/api/articles/${slug}`
         );
-        setArticle(response.data.article);
+        setArticle(articleResponse.data.article);
 
         // Fetch author's profile after getting the article
-        fetchAuthorProfile(response.data.article.author.username);
-        setIsFavorited(response.data.article.favorited);
-        setFavCount(response.data.article.favoritesCount);
+        fetchAuthorProfile(articleResponse.data.article.author.username);
+        setIsFavorited(articleResponse.data.article.favorited);
+        setFavCount(articleResponse.data.article.favoritesCount);
 
-        console.log(response.data.article.favorited);
-        console.log(response.data.article.favoritesCount);
+        console.log(articleResponse.data.article.favorited);
+        console.log(articleResponse.data.article.favoritesCount);
         // Fetch article's favorite count and status
 
-        document.title = response.data.article.title;
+        document.title = articleResponse.data.article.title;
         //Fetch Favorited status
       } catch (error) {
         console.error("Error fetching article:", error);
@@ -45,8 +45,9 @@ const Articles_View = () => {
 
     const fetchAuthorProfile = async (authorUsername) => {
       try {
-        const response = await axios.get(
+        const articleResponse = await axios.get(
           `https://api.realworld.io/api/profiles/${authorUsername}`,
+        );
         setArticle(articleResponse.data.article);
 
         const authorProfileResponse = await axios.get(
@@ -59,7 +60,7 @@ const Articles_View = () => {
         );
         setUser(authorProfileResponse.data.profile);
         setIsFollowing(authorProfileResponse.data.profile.following);
-        console.log("Is Followed: ", response.data.profile.following);
+        console.log("Is Followed: ", articleResponse.data.profile.following);
         fetchComments(); // Move the comment fetching logic here
       } catch (error) {
         console.error("Error fetching data:", error);
