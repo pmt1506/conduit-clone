@@ -43,7 +43,6 @@ const Home = () => {
         );
         const data = await response.json();
         setArticles(data.articles);
-        console.log("Total Articles:", data.articles.length);
       } catch (error) {
         console.error(`Error fetching articles for tag ${selectedTag}:`, error);
       } finally {

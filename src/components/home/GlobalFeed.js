@@ -3,8 +3,6 @@ import axios from "axios";
 import Favorite from "./Favorite";
 import Pagination from "./Pagination";
 
-// ... (imports and other code)
-
 const GlobalFeed = ({ selectedTag }) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,6 +11,8 @@ const GlobalFeed = ({ selectedTag }) => {
 
   // Assuming you have a reasonable value for articlesPerPage
   const articlesPerPage = 10;
+
+  const userToken = localStorage.getItem("userToken");
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -29,8 +29,16 @@ const GlobalFeed = ({ selectedTag }) => {
         apiUrl += `&tag=${selectedTag}`;
       }
 
-      const response = await axios.get(apiUrl);
+      const headers = {};
+
+      // If userToken is present, add the Authorization header
+      if (userToken) {
+        headers.Authorization = `Bearer ${userToken}`;
+      }
+
+      const response = await axios.get(apiUrl, { headers });
       setArticles(response.data.articles);
+      console.log("Total Global Articles: ", response.data.articlesCount);
 
       // Calculate total pages based on the total articles and articles per page
       setTotalPages(Math.ceil(response.data.articlesCount / articlesPerPage));

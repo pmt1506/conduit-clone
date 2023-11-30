@@ -30,6 +30,8 @@ const YourFeed = () => {
         }
       );
       setArticles(response.data.articles);
+      console.log("Total Your Feed Articles: ", response.data.articlesCount);
+
       setTotalPages(Math.ceil(response.data.articlesCount / articlesPerPage));
     } catch (error) {
       console.error("Error fetching articles:", error);
