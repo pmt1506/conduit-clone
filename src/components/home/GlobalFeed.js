@@ -68,7 +68,12 @@ const GlobalFeed = ({ selectedTag }) => {
       });
     }
   };
-  
+
+  const handlePageChange = (pageNumber) => {
+    const newOffset = (pageNumber - 1) * articlesPerPage;
+    setCurrentPage(pageNumber);
+    fetchArticles(newOffset);
+  };
 
 
   return (
@@ -129,8 +134,6 @@ const GlobalFeed = ({ selectedTag }) => {
               currentPage={currentPage}
               totalPages={totalPages}
               handlePageChange={handlePageChange}
-              goToPreviousPage={goToPreviousPage}
-              goToNextPage={goToNextPage}
             />
           )}
         </>
