@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import FollowButton from "../buttons/FollowButton";
 import FavoriteButton from "../buttons/FavoriteButton";
-import "../../css/Articles.css";
 import Comment from "./Comment";
 import axios from "axios";
 
@@ -27,29 +26,6 @@ const Articles_View = () => {
         );
         setArticle(articleResponse.data.article);
 
-        // Fetch author's profile after getting the article
-        fetchAuthorProfile(articleResponse.data.article.author.username);
-        setIsFavorited(articleResponse.data.article.favorited);
-        setFavCount(articleResponse.data.article.favoritesCount);
-
-        console.log(articleResponse.data.article.favorited);
-        console.log(articleResponse.data.article.favoritesCount);
-        // Fetch article's favorite count and status
-
-        document.title = articleResponse.data.article.title;
-        //Fetch Favorited status
-      } catch (error) {
-        console.error("Error fetching article:", error);
-      }
-    };
-
-    const fetchAuthorProfile = async (authorUsername) => {
-      try {
-        const articleResponse = await axios.get(
-          `https://api.realworld.io/api/profiles/${authorUsername}`,
-        );
-        setArticle(articleResponse.data.article);
-
         const authorProfileResponse = await axios.get(
           `https://api.realworld.io/api/profiles/${articleResponse.data.article.author.username}`,
           {
@@ -60,8 +36,9 @@ const Articles_View = () => {
         );
         setUser(authorProfileResponse.data.profile);
         setIsFollowing(authorProfileResponse.data.profile.following);
-        console.log("Is Followed: ", articleResponse.data.profile.following);
+
         fetchComments(); // Move the comment fetching logic here
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -146,13 +123,7 @@ const Articles_View = () => {
                 onUpdateFollow={handleUpdateFollow}
                 pageStyle="article-button"
               />
-              {/* Favorite Button */}
               <FavoriteButton articleSlug={article.slug} />
-            </span>
-            {/* IF CURRENT USER IS AUTHOR */}
-            <span style={{ display: "none" }}>
-              <button>Edit</button>
-              <button>Delete</button>
             </span>
           </div>
         </div>
@@ -191,12 +162,6 @@ const Articles_View = () => {
                 onUpdateFollow={handleUpdateFollow}
                 pageStyle="article-button"
               />
-              <FavoriteButton articleSlug={article.slug} />
-            </span>
-            {/* IF CURRENT USER IS AUTHOR */}
-            <span style={{ display: "none" }}>
-              <button>Edit</button>
-              <button>Delete</button>
               <FavoriteButton articleSlug={article.slug} />
             </span>
           </div>
