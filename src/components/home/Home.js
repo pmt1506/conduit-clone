@@ -79,20 +79,24 @@ const Home = () => {
               <div className="feed-toggle">
                 <ul className="nav nav-pills outline-active">
                   <li className="nav-item">
-                    <div
-                      className={`nav-link ${
-                        !selectedTag && feedStatus === "your" ? "active" : ""
-                      }`}
-                      style={{ cursor: "pointer", color: "#555" }}
-                      onClick={() => handleFeedStatusChange("your")}
-                    >
-                      Your Feed
-                    </div>
+                    {userToken && (
+                      <div
+                        className={`nav-link ${
+                          !selectedTag && feedStatus === "your" ? "active" : ""
+                        }`}
+                        style={{ cursor: "pointer", color: "#555" }}
+                        onClick={() => handleFeedStatusChange("your")}
+                      >
+                        Your Feed
+                      </div>
+                    )}
                   </li>
                   <li className="nav-item">
                     <div
                       className={`nav-link ${
-                        !selectedTag && feedStatus !== "your" ? "active" : ""
+                        (!selectedTag && feedStatus !== "your") || !userToken
+                          ? "active"
+                          : ""
                       }`}
                       onClick={() => {
                         setSelectedTag(null);

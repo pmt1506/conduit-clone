@@ -2,7 +2,7 @@ import React from 'react';
 import '../../css/Pagination.css';
 
 const Pagination = ({ currentPage, totalPages, handlePageChange }) => (
-  <ul className="pagination mt-4">
+  <ul className="pagination mt-1">
     {Array.from({ length: totalPages }, (_, index) => (
       <li
         key={index + 1}
