@@ -167,19 +167,33 @@ const Articles_View = () => {
             </span>
           </div>
           <div className="row">
-            <div className="col-md-8 offset-md-2">
-              <form onSubmit={handleCommentSubmit}>
-                <div className="form-group">
-                  <textarea
-                    className="form-control"
-                    placeholder="Add your comment..."
-                    value={newComment}
-                    onChange={handleCommentChange}
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary">
-                  Add Comment
-                </button>
+            <div className="col-xs-12 col-md-8 offset-md-2">
+              <form className="card comment-form" onSubmit={handleCommentSubmit}>
+                <fieldset >
+                  <div class="card-block">
+                    <textarea class="form-control"
+                      placeholder="Add your comment..."
+                      rows="3" value={newComment}
+                      onChange={handleCommentChange}></textarea>
+                  </div>
+                  <div class="card-footer">
+                    <img class="comment-author-img" />
+                    <button class="btn btn-sm btn-success" type="submit">
+                      Post Comment
+                    </button>
+                  </div>
+                  {/* <div className="card-block">
+                    <textarea
+                      className="form-control"
+                      placeholder="Add your comment..."
+                      value={newComment}
+                      onChange={handleCommentChange}
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary">
+                    Add Comment
+                  </button> */}
+                </fieldset>
               </form>
               <div className="comments">
                 {comments.map((comment) => (
