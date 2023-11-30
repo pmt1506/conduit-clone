@@ -15,6 +15,7 @@ const Articles_View = () => {
   const [favCount, setFavCount] = useState(0);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
 
   const userToken = localStorage.getItem("userToken");
   const { slug } = useParams();
@@ -38,6 +39,8 @@ const Articles_View = () => {
         setUser(authorProfileResponse.data.profile);
         setIsFollowing(authorProfileResponse.data.profile.following);
 
+        fetchUserInfo(userToken); //for getting user's image
+
         fetchComments(); // Move the comment fetching logic here
 
       } catch (error) {
@@ -47,6 +50,24 @@ const Articles_View = () => {
 
     fetchData();
   }, [slug, userToken]);
+
+  const fetchUserInfo = async (token) => {
+    try {
+      const response = await axios.get("https://api.realworld.io/api/user", {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+
+      // Assuming the API returns user information
+      const userData = response.data.user;
+
+      // Set user information in state
+      setUserInfo(userData);
+    } catch (error) {
+      console.error("Error fetching user information:", error);
+    }
+  };
 
   const handleCommentChange = (event) => {
     setNewComment(event.target.value);
@@ -166,33 +187,29 @@ const Articles_View = () => {
               <FavoriteButton articleSlug={article.slug} />
             </span>
           </div>
+          </div>
           <div className="row">
             <div className="col-xs-12 col-md-8 offset-md-2">
               <form className="card comment-form" onSubmit={handleCommentSubmit}>
                 <fieldset >
                   <div class="card-block">
                     <textarea class="form-control"
-                      placeholder="Add your comment..."
+                      placeholder="Write a comment..."
                       rows="3" value={newComment}
                       onChange={handleCommentChange}></textarea>
                   </div>
                   <div class="card-footer">
-                    <img class="comment-author-img" />
+                    {userInfo && userInfo.image && (
+                      <img
+                        class="comment-author-img"
+                        src={userInfo.image}
+                        alt="user's image"
+                      />
+                    )}
                     <button class="btn btn-sm btn-success" type="submit">
                       Post Comment
                     </button>
                   </div>
-                  {/* <div className="card-block">
-                    <textarea
-                      className="form-control"
-                      placeholder="Add your comment..."
-                      value={newComment}
-                      onChange={handleCommentChange}
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-primary">
-                    Add Comment
-                  </button> */}
                 </fieldset>
               </form>
               <div className="comments">
@@ -205,7 +222,6 @@ const Articles_View = () => {
                 ))}
               </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
