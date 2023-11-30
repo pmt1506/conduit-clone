@@ -83,7 +83,7 @@ const Home = () => {
                     <li className="nav-item">
                       <div
                         className={`nav-link ${
-                          feedStatus === "your" ? "active" : ""
+                          feedStatus === "your" && !selectedTag ? "active" : ""
                         }`}
                         onClick={() => handleFeedStatusChange("your")}
                         style={{ color: "#555", cursor: "pointer" }}
