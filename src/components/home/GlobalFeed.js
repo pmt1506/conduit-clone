@@ -44,6 +44,8 @@ const GlobalFeed = () => {
     }
   };
 
+
+
   return (
     <div>
       {loading ? (

@@ -1,44 +1,113 @@
+import React, { useState } from "react";
+import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.css';
 
-const Create_Article = () => {
-    return (
-        <div class="editor-page">
-            <div class="container page">
-                <div class="row">
-                    <div class="col-md-10 offset-md-1 col-xs-12">
-                        <ul class="error-messages">
-                        </ul>
+const Create_Articles = ({ onUpdateArticles }) => {
+  const [articleData, setArticleData] = useState({
+    title: "",
+    description: "",
+    body: "",
+    tags: "",
+  });
 
-                        <form>
-                            <fieldset>
-                                <fieldset class="form-group">
-                                    <input type="text" class="form-control form-control-lg" placeholder="Article Title" />
-                                </fieldset>
-                                <fieldset class="form-group">
-                                    <input type="text" class="form-control" placeholder="What's this article about?" />
-                                </fieldset>
-                                <fieldset class="form-group">
-                                    <textarea
-                                        class="form-control"
-                                        rows="8"
-                                        placeholder="Write your article (in markdown)"
-                                    ></textarea>
-                                </fieldset>
-                                <fieldset class="form-group">
-                                    <input type="text" class="form-control" placeholder="Enter tags" />
-                                    <div class="tag-list">
-                                    </div>
-                                </fieldset>
-                                <button style={{alignItems: "left"}} class="btn btn-lg pull-xs-right btn-success" type="button">
-                                    Publish Article
-                                </button>
-                            </fieldset>
-                        </form>
-                    </div>
-                </div>
-            </div>
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setArticleData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handlePublishArticle = async () => {
+    try {
+      const response = await axios.post(
+        "https://api.realworld.io/api/articles",
+        {
+          article: {
+            title: articleData.title,
+            description: articleData.description,
+            body: articleData.body,
+            tagList: articleData.tags.split(",").map(tag => tag.trim()),
+          },
+        }
+        // You may need to include authentication headers if required
+      );
+
+      // Notify parent component (GlobalFeed) about the new article
+      onUpdateArticles(response.data.article);
+      
+      // Reset form data
+      setArticleData({
+        title: "",
+        description: "",
+        body: "",
+        tags: "",
+      });
+    } catch (error) {
+      console.error("Error publishing article:", error);
+    }
+  };
+
+  return (
+    <div className="editor-page">
+      <div className="container page">
+        <div className="row">
+          <div className="col-md-10 offset-md-1 col-xs-12">
+            <ul className="error-messages"></ul>
+            <form>
+              <fieldset>
+                <fieldset className="form-group">
+                  <input
+                    type="text"
+                    className="form-control form-control-lg"
+                    placeholder="Article Title"
+                    name="title"
+                    value={articleData.title}
+                    onChange={handleInputChange}
+                  />
+                </fieldset>
+                <fieldset className="form-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="What's this article about?"
+                    name="description"
+                    value={articleData.description}
+                    onChange={handleInputChange}
+                  />
+                </fieldset>
+                <fieldset className="form-group">
+                  <textarea
+                    className="form-control"
+                    rows="8"
+                    placeholder="Write your article (in markdown)"
+                    name="body"
+                    value={articleData.body}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </fieldset>
+                <fieldset className="form-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter tags"
+                    name="tags"
+                    value={articleData.tags}
+                    onChange={handleInputChange}
+                  />
+                  <div className="tag-list"></div>
+                </fieldset>
+                <button
+                  className="btn btn-lg btn-success ml-auto"
+                  type="button"
+                  onClick={handlePublishArticle}
+                >
+                  Publish Article
+                </button>
+              </fieldset>
+            </form>
+          </div>
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
-export default Create_Article
+export default Create_Articles;
