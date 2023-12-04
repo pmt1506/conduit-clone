@@ -24,7 +24,7 @@ const Header = () => {
     try {
       const response = await axios.get("https://api.realworld.io/api/user", {
         headers: {
-          Authorization: `Token ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
