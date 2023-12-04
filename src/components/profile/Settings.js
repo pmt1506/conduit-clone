@@ -102,6 +102,8 @@ const Settings = () => {
         success: true,
         message: "Settings updated successfully!",
       });
+
+      navigate(`/${response.user.username}`);
     } catch (error) {
       console.error("Error status:", error.response.status);
       console.error("Error data:", error.response.data);
