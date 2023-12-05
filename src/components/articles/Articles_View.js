@@ -207,24 +207,24 @@ const Articles_View = () => {
           <div className="col-xs-12 col-md-8 offset-md-2">
             <form className="card comment-form" onSubmit={handleCommentSubmit}>
               <fieldset>
-                <div class="card-block">
+                <div className="card-block">
                   <textarea
-                    class="form-control"
+                    className="form-control"
                     placeholder="Write a comment..."
                     rows="3"
                     value={newComment}
                     onChange={handleCommentChange}
                   ></textarea>
                 </div>
-                <div class="card-footer">
+                <div className="card-footer">
                   {userInfo && userInfo.image && (
                     <img
-                      class="comment-author-img"
+                      className="comment-author-img"
                       src={userInfo.image}
                       alt="user's image"
                     />
                   )}
-                  <button class="btn btn-sm btn-success" type="submit">
+                  <button className="btn btn-sm btn-success" type="submit">
                     Post Comment
                   </button>
                 </div>
