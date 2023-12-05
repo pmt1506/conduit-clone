@@ -177,14 +177,12 @@ const Settings = () => {
                   onChange={(e) => setNewPassword(e.target.value)}
                 />
               </div>
-              <div className="form-group">
-                <button
-                  type="submit"
-                  className="btn btn-lg btn-success float-end btn-setting"
-                >
-                  Update Settings
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="btn btn-lg btn-success float-end btn-setting"
+              >
+                Update Settings
+              </button>
             </form>
             <div
               className="text-center"

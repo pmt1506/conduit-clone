@@ -33,7 +33,6 @@ const Header = () => {
     }
   };
 
-
   return (
     <nav className="navbar navbar-light">
       <div className="container">
@@ -42,7 +41,7 @@ const Header = () => {
         </a>
         <ul className="nav navbar-nav flex-row ml-auto">
           <li className="nav-item">
-            <NavLink className="nav-link" exact to="/">
+            <NavLink className="nav-link" to="/">
               Home
             </NavLink>
           </li>
