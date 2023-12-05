@@ -1,5 +1,5 @@
 // Comment.js
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "../../css/Articles.css";
 import axios from "axios";
 

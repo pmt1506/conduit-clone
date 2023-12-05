@@ -120,7 +120,7 @@ const Settings = () => {
     // Clear session storage
     localStorage.clear();
     // Redirect to the login page (replace '/login' with the actual path)
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   return (

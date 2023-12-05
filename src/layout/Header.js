@@ -15,7 +15,9 @@ const Header = () => {
       fetchUserInfo(tokenFromStorage);
     }
 
-    console.log("This is token from header: ", tokenFromStorage);
+    if (tokenFromStorage) {
+      console.log("This is token from header: ", tokenFromStorage);
+    }
   }, []);
 
   const fetchUserInfo = async (token) => {
@@ -32,7 +34,6 @@ const Header = () => {
       console.error("Error fetching user information:", error);
     }
   };
-
 
   return (
     <nav className="navbar navbar-light">
