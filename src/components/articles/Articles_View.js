@@ -148,13 +148,13 @@ const Articles_View = () => {
               <span className="date">{formattedDate}</span>
             </div>
             <span>
+              <FavoriteButton articleSlug={article.slug} />
               <FollowButton
                 key={isFollowing ? "following" : "notFollowing"}
                 profileUsername={user.username}
                 onUpdateFollow={handleUpdateFollow}
                 pageStyle="article-button"
               />
-              <FavoriteButton articleSlug={article.slug} />
             </span>
           </div>
         </div>
@@ -192,13 +192,13 @@ const Articles_View = () => {
               <span className="date">{formattedDate}</span>
             </div>
             <span>
+              <FavoriteButton articleSlug={article.slug} />
               <FollowButton
                 key={isFollowing ? "following" : "notFollowing"}
                 profileUsername={user.username}
                 onUpdateFollow={handleUpdateFollow}
                 pageStyle="article-button"
               />
-              <FavoriteButton articleSlug={article.slug} />
             </span>
           </div>
         </div>
@@ -207,24 +207,24 @@ const Articles_View = () => {
           <div className="col-xs-12 col-md-8 offset-md-2">
             <form className="card comment-form" onSubmit={handleCommentSubmit}>
               <fieldset>
-                <div className="card-block">
+                <div class="card-block">
                   <textarea
-                    className="form-control"
+                    class="form-control"
                     placeholder="Write a comment..."
                     rows="3"
                     value={newComment}
                     onChange={handleCommentChange}
                   ></textarea>
                 </div>
-                <div className="card-footer">
+                <div class="card-footer">
                   {userInfo && userInfo.image && (
                     <img
-                      className="comment-author-img"
+                      class="comment-author-img"
                       src={userInfo.image}
                       alt="user's image"
                     />
                   )}
-                  <button className="btn btn-sm btn-success" type="submit">
+                  <button class="btn btn-sm btn-success" type="submit">
                     Post Comment
                   </button>
                 </div>
