@@ -14,6 +14,8 @@ const Header = () => {
     if (tokenFromStorage) {
       fetchUserInfo(tokenFromStorage);
     }
+
+    console.log("This is token from header: ", tokenFromStorage);
   }, []);
 
   const fetchUserInfo = async (token) => {

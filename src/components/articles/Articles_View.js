@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import FollowButton from "../buttons/FollowButton";
 import FavoriteButton from "../buttons/FavoriteButton";
-import "../../css/Articles.css"
+import "../../css/Articles.css";
 import Comment from "./Comment";
 import axios from "axios";
 
@@ -42,7 +42,6 @@ const Articles_View = () => {
         fetchUserInfo(userToken); //for getting user's image
 
         fetchComments(); // Move the comment fetching logic here
-
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -102,13 +101,19 @@ const Articles_View = () => {
   const fetchComments = async () => {
     try {
       const commentsResponse = await axios.get(
-        `https://api.realworld.io/api/articles/${slug}/comments`
+        `https://api.realworld.io/api/articles/${slug}/comments`,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
       );
       setComments(commentsResponse.data.comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
   };
+  
 
   if (!article || !user) {
     return <div>Loading...</div>;
@@ -187,41 +192,45 @@ const Articles_View = () => {
               <FavoriteButton articleSlug={article.slug} />
             </span>
           </div>
-          </div>
-          <div className="row">
-            <div className="col-xs-12 col-md-8 offset-md-2">
-              <form className="card comment-form" onSubmit={handleCommentSubmit}>
-                <fieldset >
-                  <div class="card-block">
-                    <textarea class="form-control"
-                      placeholder="Write a comment..."
-                      rows="3" value={newComment}
-                      onChange={handleCommentChange}></textarea>
-                  </div>
-                  <div class="card-footer">
-                    {userInfo && userInfo.image && (
-                      <img
-                        class="comment-author-img"
-                        src={userInfo.image}
-                        alt="user's image"
-                      />
-                    )}
-                    <button class="btn btn-sm btn-success" type="submit">
-                      Post Comment
-                    </button>
-                  </div>
-                </fieldset>
-              </form>
-              <div className="comments">
-                {comments.map((comment) => (
-                  <Comment
-                    key={comment.id}
-                    comment={comment}
-                    fetchComments={fetchComments}
-                  />
-                ))}
-              </div>
+        </div>
+        {/* Comment */}
+        <div className="row mb-5">
+          <div className="col-xs-12 col-md-8 offset-md-2">
+            <form className="card comment-form" onSubmit={handleCommentSubmit}>
+              <fieldset>
+                <div class="card-block">
+                  <textarea
+                    class="form-control"
+                    placeholder="Write a comment..."
+                    rows="3"
+                    value={newComment}
+                    onChange={handleCommentChange}
+                  ></textarea>
+                </div>
+                <div class="card-footer">
+                  {userInfo && userInfo.image && (
+                    <img
+                      class="comment-author-img"
+                      src={userInfo.image}
+                      alt="user's image"
+                    />
+                  )}
+                  <button class="btn btn-sm btn-success" type="submit">
+                    Post Comment
+                  </button>
+                </div>
+              </fieldset>
+            </form>
+            <div className="comments">
+              {comments.map((comment) => (
+                <Comment
+                  key={comment.id}
+                  comment={comment}
+                  fetchComments={fetchComments}
+                />
+              ))}
             </div>
+          </div>
         </div>
       </div>
     </div>
