@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
-import 'bootstrap/dist/css/bootstrap.css';
+import { useNavigate } from "react-router-dom";
+import '../../css/Create_Articles.css';
 
-const Create_Articles = ({ onUpdateArticles }) => {
+const Create_Articles = () => {
+  const userToken = localStorage.getItem("userToken") || "";
+  const navigate = useNavigate(); // Initialize navigate
+
   const [articleData, setArticleData] = useState({
     title: "",
     description: "",
@@ -24,16 +28,19 @@ const Create_Articles = ({ onUpdateArticles }) => {
             title: articleData.title,
             description: articleData.description,
             body: articleData.body,
-            tagList: articleData.tags.split(",").map(tag => tag.trim()),
+            tagList: articleData.tags.split(",").map((tag) => tag.trim()),
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
           },
         }
-        // You may need to include authentication headers if required
       );
 
-      // Notify parent component (GlobalFeed) about the new article
-      onUpdateArticles(response.data.article);
-      
-      // Reset form data
+      // After publishing, navigate to the article detail page
+      navigate(`/article/${response.data.article.slug}`);
+
       setArticleData({
         title: "",
         description: "",
@@ -50,7 +57,6 @@ const Create_Articles = ({ onUpdateArticles }) => {
       <div className="container page">
         <div className="row">
           <div className="col-md-10 offset-md-1 col-xs-12">
-            <ul className="error-messages"></ul>
             <form>
               <fieldset>
                 <fieldset className="form-group">
@@ -95,7 +101,7 @@ const Create_Articles = ({ onUpdateArticles }) => {
                   <div className="tag-list"></div>
                 </fieldset>
                 <button
-                  className="btn btn-lg btn-success ml-auto"
+                  className="btn btn-lg btn-success btn-primary ml-auto"
                   type="button"
                   onClick={handlePublishArticle}
                 >
