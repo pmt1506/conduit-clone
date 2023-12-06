@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import FollowButton from "../buttons/FollowButton";
 import FavoriteButton from "../buttons/FavoriteButton";
+import { useNavigate } from "react-router-dom";
 import "../../css/Articles.css";
 import Comment from "./Comment";
 import axios from "axios";
@@ -17,8 +18,12 @@ const Articles_View = () => {
   const [newComment, setNewComment] = useState("");
   const [userInfo, setUserInfo] = useState(null);
 
+  const isArticleOwner =
+    user && userInfo && user.username === userInfo.username;
+
   const userToken = localStorage.getItem("userToken");
   const { slug } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,7 +59,7 @@ const Articles_View = () => {
     try {
       const response = await axios.get("https://api.realworld.io/api/user", {
         headers: {
-          Authorization: `Token ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -114,8 +119,30 @@ const Articles_View = () => {
     }
   };
 
+  const handleDeleteArticle = async () => {
+    try {
+      await axios.delete(`https://api.realworld.io/api/articles/${slug}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+
+      // Redirect or perform additional actions after successful deletion
+      navigate("/");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting article:", error);
+      // Handle error or display a message to the user
+    }
+  };
+
+  const handleEditArticle = () => {
+    // Navigate to the edit article page
+    navigate(`/editor/${slug}`);
+  };
+
   if (!article || !user) {
-    return <div>Loading...</div>;
+    return <div className="container">Loading...</div>;
   }
 
   const formattedDate = new Date(article.createdAt).toLocaleDateString(
@@ -148,13 +175,51 @@ const Articles_View = () => {
               <span className="date">{formattedDate}</span>
             </div>
             <span>
-              <FavoriteButton articleSlug={article.slug} />
-              <FollowButton
-                key={isFollowing ? "following" : "notFollowing"}
-                profileUsername={user.username}
-                onUpdateFollow={handleUpdateFollow}
-                pageStyle="article-button"
-              />
+              {isArticleOwner ? (
+                <span>
+                  {/* Add Edit and Delete buttons here */}
+                  <button
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={handleEditArticle}
+                    style={{
+                      height: "31px",
+                      lineHeight: "21px",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    <i
+                      className="bi bi-pencil"
+                      style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                    ></i>
+                    Edit Article
+                  </button>
+                  <button
+                    className="btn btn-sm btn-outline-danger ml-2"
+                    onClick={handleDeleteArticle}
+                    style={{
+                      height: "31px",
+                      lineHeight: "21px",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    <i
+                      className="bi bi-trash-fill"
+                      style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                    ></i>
+                    Delete Article
+                  </button>
+                </span>
+              ) : (
+                <span>
+                  <FollowButton
+                    key={isFollowing ? "following" : "notFollowing"}
+                    profileUsername={user.username}
+                    onUpdateFollow={handleUpdateFollow}
+                    pageStyle="article-button"
+                  />
+                  <FavoriteButton articleSlug={article.slug} />
+                </span>
+              )}
             </span>
           </div>
         </div>
@@ -192,13 +257,51 @@ const Articles_View = () => {
               <span className="date">{formattedDate}</span>
             </div>
             <span>
-              <FavoriteButton articleSlug={article.slug} />
-              <FollowButton
-                key={isFollowing ? "following" : "notFollowing"}
-                profileUsername={user.username}
-                onUpdateFollow={handleUpdateFollow}
-                pageStyle="article-button"
-              />
+              {isArticleOwner ? (
+                <span>
+                  {/* Add Edit and Delete buttons here */}
+                  <button
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={handleEditArticle}
+                    style={{
+                      height: "31px",
+                      lineHeight: "21px",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    <i
+                      className="bi bi-pencil"
+                      style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                    ></i>
+                    Edit Article
+                  </button>
+                  <button
+                    className="btn btn-sm btn-outline-danger ml-2"
+                    onClick={handleDeleteArticle}
+                    style={{
+                      height: "31px",
+                      lineHeight: "21px",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    <i
+                      className="bi bi-trash-fill"
+                      style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                    ></i>
+                    Delete Article
+                  </button>
+                </span>
+              ) : (
+                <span>
+                  <FollowButton
+                    key={isFollowing ? "following" : "notFollowing"}
+                    profileUsername={user.username}
+                    onUpdateFollow={handleUpdateFollow}
+                    pageStyle="article-button"
+                  />
+                  <FavoriteButton articleSlug={article.slug} />
+                </span>
+              )}
             </span>
           </div>
         </div>

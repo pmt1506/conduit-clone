@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import '../../css/Create_Articles.css';
+import { useParams, useNavigate } from "react-router-dom";
 
-const Create_Articles = () => {
-  const userToken = localStorage.getItem("userToken") || "";
-  const navigate = useNavigate(); // Initialize navigate
+const Edit_Articles = () => {
+  const navigate = useNavigate();
+  const { slug } = useParams();
 
   const [articleData, setArticleData] = useState({
     title: "",
@@ -14,22 +13,57 @@ const Create_Articles = () => {
     tags: "",
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setArticleData((prevData) => ({ ...prevData, [name]: value }));
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchArticleData = async () => {
+      try {
+        setLoading(true); // Set loading to true while fetching data
+
+        const response = await axios.get(
+          `https://api.realworld.io/api/articles/${slug}`
+        );
+
+        const article = response.data.article;
+
+        setArticleData({
+          title: article.title,
+          description: article.description,
+          body: article.body,
+          tags: article.tagList.join(", "),
+        });
+      } catch (error) {
+        console.error("Error fetching article data:", error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching data
+      }
+    };
+
+    fetchArticleData();
+  }, [slug]);
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setArticleData({
+      ...articleData,
+      [name]: value,
+    });
   };
 
   const handlePublishArticle = async () => {
     try {
-      const response = await axios.post(
-        "https://api.realworld.io/api/articles",
+      const userToken = localStorage.getItem("userToken");
+
+      const updatedArticle = {
+        title: articleData.title,
+        description: articleData.description,
+        body: articleData.body,
+      };
+
+      const response = await axios.put(
+        `https://api.realworld.io/api/articles/${slug}`,
         {
-          article: {
-            title: articleData.title,
-            description: articleData.description,
-            body: articleData.body,
-            tagList: articleData.tags.split(",").map((tag) => tag.trim()),
-          },
+          article: updatedArticle,
         },
         {
           headers: {
@@ -38,19 +72,19 @@ const Create_Articles = () => {
         }
       );
 
-      // After publishing, navigate to the article detail page
-      navigate(`/article/${response.data.article.slug}`);
+      // Extract the new slug from the response
+      const newSlug = response.data.article.slug;
 
-      setArticleData({
-        title: "",
-        description: "",
-        body: "",
-        tags: "",
-      });
+      // Navigate to the new slug
+      navigate(`/article/${newSlug}`);
     } catch (error) {
       console.error("Error publishing article:", error);
     }
   };
+
+  if (loading) {
+    return <div className="container">Loading...</div>;
+  }
 
   return (
     <div className="editor-page">
@@ -116,4 +150,4 @@ const Create_Articles = () => {
   );
 };
 
-export default Create_Articles;
+export default Edit_Articles;

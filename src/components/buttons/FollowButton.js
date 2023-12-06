@@ -82,7 +82,8 @@ const FollowButton = ({ profileUsername, onUpdateFollow, pageStyle }) => {
       style={{
         cursor: isToggling ? "not-allowed" : "pointer",
         height: "31px",
-        lineHeight: "21px", // Set the desired lineHeight
+        lineHeight: "21px",
+        marginLeft: "5px",
       }}
     >
       <i

@@ -179,7 +179,7 @@ const Settings = () => {
               </div>
               <button
                 type="submit"
-                className="btn btn-lg btn-success float-end btn-setting"
+                className="btn btn-lg btn-primary float-end btn-setting"
               >
                 Update Settings
               </button>
