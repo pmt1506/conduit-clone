@@ -3,7 +3,7 @@ import axios from "axios";
 import "../css/Layout.css";
 import { NavLink } from "react-router-dom";
 
-const Header = () => {
+const Header = React.memo(() => {
   const [userToken, setUserToken] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
 
@@ -87,7 +87,7 @@ const Header = () => {
                     marginRight: "0.5rem",
                   }}
                 />
-                <a className="nav-link" href={`/${userInfo.username}`}>
+                <a className="nav-link" href={`/@${userInfo.username}`}>
                   {userInfo.username}
                 </a>
               </li>
@@ -111,6 +111,6 @@ const Header = () => {
       </div>
     </nav>
   );
-};
+});
 
 export default Header;

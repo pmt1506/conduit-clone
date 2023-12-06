@@ -19,17 +19,19 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      
       try {
         const response = await axios.get(
-          `https://api.realworld.io/api/profiles/${profileUsername}`,
+          `https://api.realworld.io/api/profiles/${profileUsername.substring(1)}`,
           {
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
           }
-        );
-        setUser(response.data.profile);
-        setIsFollowing(response.data.profile.following);
+          );
+          setUser(response.data.profile);
+          setIsFollowing(response.data.profile.following);
+          document.title = `@${response.data.profile.username}`
       } catch (error) {
         console.error("Error fetching profile data:", error);
       }
@@ -67,6 +69,7 @@ const Profile = () => {
   useEffect(() => {
     console.log("Following: ", isFollowing);
   }, [isFollowing]);
+
 
   return (
     <div className="profile-page">

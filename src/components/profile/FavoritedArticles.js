@@ -79,14 +79,14 @@ const FavoritedArticles = ({ username }) => {
             favoritedArticles.map((article) => (
               <div key={article.slug} className="article-preview">
                 <div className="article-meta">
-                  <a href={`/${article.author.username}`}>
+                  <a href={`/@${article.author.username}`}>
                     <img
                       src={article.author.image}
                       alt={article.author.username}
                     />
                   </a>
                   <div className="info">
-                    <a href={`/${article.author.username}`} className="author">
+                    <a href={`/@${article.author.username}`} className="author">
                       {article.author.username}
                     </a>
                     <span className="date">

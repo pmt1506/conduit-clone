@@ -25,7 +25,7 @@ function App() {
           <Route path="/article/:slug" element={<Articles_View />}/>
           <Route path="/editor" element = {<Create_Articles/>}/>
           <Route path="/editor/:slug" element = {<Edit_Articles/>}/>
-
+          
         </Routes>
       </div>
     </BrowserRouter>

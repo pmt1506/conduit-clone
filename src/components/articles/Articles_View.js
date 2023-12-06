@@ -160,7 +160,7 @@ const Articles_View = () => {
         <div className="container">
           <h1>{article.title}</h1>
           <div className="article-meta_1">
-            <a href={`/${article.author.username}`}>
+            <a href={`/@${article.author.username}`}>
               <img
                 src={article.author.image}
                 alt=""
@@ -169,7 +169,7 @@ const Articles_View = () => {
               />
             </a>
             <div className="info">
-              <a href={`/${article.author.username}`}>
+              <a href={`/@${article.author.username}`}>
                 {article.author.username}
               </a>
               <span className="date">{formattedDate}</span>
@@ -242,7 +242,7 @@ const Articles_View = () => {
         <hr />
         <div className="article-actions">
           <div className="article-meta_2">
-            <a href={`/${article.author.username}`}>
+            <a href={`/@${article.author.username}`}>
               <img
                 src={article.author.image}
                 alt=""
@@ -251,7 +251,7 @@ const Articles_View = () => {
               />
             </a>
             <div className="info">
-              <a href={`/${article.author.username}`}>
+              <a href={`/@${article.author.username}`}>
                 {article.author.username}
               </a>
               <span className="date">{formattedDate}</span>

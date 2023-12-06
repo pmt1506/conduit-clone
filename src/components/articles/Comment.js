@@ -30,7 +30,7 @@ const Comment = ({ comment, onReply, fetchComments }) => {
       </div>
       <div className="card-footer">
         {comment.author.image && (
-          <a href={`/${comment.author.username}`}>
+          <a href={`/@${comment.author.username}`}>
             <img
               src={comment.author.image}
               alt={`${comment.author.username}'s image`}
@@ -38,7 +38,7 @@ const Comment = ({ comment, onReply, fetchComments }) => {
             />
           </a>
         )}
-        <a href={`/${comment.author.username}`} className="comment-author">
+        <a href={`/@${comment.author.username}`} className="comment-author">
           {comment.author.username}
         </a>
         <span className="date-posted">
