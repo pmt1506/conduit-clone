@@ -10,15 +10,16 @@ const Edit_Articles = () => {
     title: "",
     description: "",
     body: "",
-    tags: "",
+    tags: "", // Initialize tags as an empty string
   });
 
+  const [tagList, setTagList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchArticleData = async () => {
       try {
-        setLoading(true); // Set loading to true while fetching data
+        setLoading(true);
 
         const response = await axios.get(
           `https://api.realworld.io/api/articles/${slug}`
@@ -30,12 +31,14 @@ const Edit_Articles = () => {
           title: article.title,
           description: article.description,
           body: article.body,
-          tags: article.tagList.join(", "),
+          tags: "", // Set tags to an empty string onload
         });
+
+        setTagList(article.tagList);
       } catch (error) {
         console.error("Error fetching article data:", error);
       } finally {
-        setLoading(false); // Set loading to false after fetching data
+        setLoading(false);
       }
     };
 
@@ -50,6 +53,22 @@ const Edit_Articles = () => {
     });
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && articleData.tags.trim() !== "") {
+      e.preventDefault();
+
+      if (!tagList.includes(articleData.tags.trim())) {
+        setTagList((prevTagList) => [...prevTagList, articleData.tags.trim()]);
+      }
+
+      setArticleData((prevData) => ({ ...prevData, tags: "" }));
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setTagList((prevTagList) => prevTagList.filter((tag) => tag !== tagToRemove));
+  };
+
   const handlePublishArticle = async () => {
     try {
       const userToken = localStorage.getItem("userToken");
@@ -58,6 +77,7 @@ const Edit_Articles = () => {
         title: articleData.title,
         description: articleData.description,
         body: articleData.body,
+        tagList: tagList,
       };
 
       const response = await axios.put(
@@ -72,10 +92,7 @@ const Edit_Articles = () => {
         }
       );
 
-      // Extract the new slug from the response
       const newSlug = response.data.article.slug;
-
-      // Navigate to the new slug
       navigate(`/article/${newSlug}`);
     } catch (error) {
       console.error("Error publishing article:", error);
@@ -94,6 +111,7 @@ const Edit_Articles = () => {
             <form>
               <fieldset>
                 <fieldset className="form-group">
+                  <label htmlFor="title">Article Title</label>
                   <input
                     type="text"
                     className="form-control form-control-lg"
@@ -101,9 +119,11 @@ const Edit_Articles = () => {
                     name="title"
                     value={articleData.title}
                     onChange={handleInputChange}
+                    style={{fontSize:'16px'}}
                   />
                 </fieldset>
                 <fieldset className="form-group">
+                  <label htmlFor="description">Description</label>
                   <input
                     type="text"
                     className="form-control"
@@ -114,6 +134,7 @@ const Edit_Articles = () => {
                   />
                 </fieldset>
                 <fieldset className="form-group">
+                  <label htmlFor="body">Article Body</label>
                   <textarea
                     className="form-control"
                     rows="8"
@@ -124,15 +145,24 @@ const Edit_Articles = () => {
                   ></textarea>
                 </fieldset>
                 <fieldset className="form-group">
+                  <label htmlFor="tags">Tags</label>
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Enter tags"
+                    placeholder="Enter tags and press Enter"
                     name="tags"
                     value={articleData.tags}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                   />
-                  <div className="tag-list"></div>
+                  <div className="tag-list mt-1">
+                    {tagList.map((tag, index) => (
+                      <span key={index} className="tag-default tag-pill">
+                        <i className="bi bi-x" onClick={() => removeTag(tag)}></i>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </fieldset>
                 <button
                   className="btn btn-lg btn-success btn-primary ml-auto float-end"

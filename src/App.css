@@ -42,7 +42,7 @@
   padding-right: 5rem !important;
 }
 
-.form-group{
+.form-group input, .form-group textarea{
   border: 1px solid #c0c0c0 !important;
   border-radius: 0.3rem !important;
 }
