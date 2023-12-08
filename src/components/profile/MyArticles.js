@@ -12,7 +12,7 @@ const MyArticles = ({ username }) => {
   const [totalPages, setTotalPages] = useState(1);
 
   // Assuming you have a reasonable value for articlesPerPage
-  const articlesPerPage = 10;
+  const articlesPerPage = 5;
 
   const userToken = localStorage.getItem("userToken");
 
