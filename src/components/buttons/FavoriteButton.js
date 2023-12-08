@@ -15,16 +15,34 @@ const FavoriteButton = ({ articleSlug }) => {
         const response = await axios.get(
           `https://api.realworld.io/api/articles/${articleSlug}`,
           {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
+            headers: userToken
+              ? { Authorization: `Bearer ${userToken}` }
+              : undefined, // Pass undefined if userToken is not available
           }
         );
-        setIsFavoriting(response.data.article.favorited);
-        setFavCount(response.data.article.favoritesCount);
-        setCheck(!check); // Toggle the check variable to trigger re-render
+
+        // Check if the response contains the expected data structure
+        if (
+          response.data &&
+          response.data.article &&
+          response.data.article.favorited !== undefined &&
+          response.data.article.favoritesCount !== undefined
+        ) {
+          // Update favorite status and count after fetching data
+          setIsFavoriting(response.data.article.favorited);
+          setFavCount(response.data.article.favoritesCount);
+
+          // Log the favorite count
+          console.log("Favorite Count:", response.data.article.favoritesCount);
+        } else {
+          console.error("Invalid response format:", response.data);
+        }
       } catch (error) {
         console.error("Error fetching favorite status:", error);
+
+        // Handle the error, set default values, or redirect to login if necessary
+        setIsFavoriting(false);
+        setFavCount(0);
       }
     };
 
@@ -92,7 +110,9 @@ const FavoriteButton = ({ articleSlug }) => {
       }}
     >
       <i
-        className={`bi ${isFavoriting ? "bi-suit-heart-fill" : "bi-suit-heart"}`}
+        className={`bi ${
+          isFavoriting ? "bi-suit-heart-fill" : "bi-suit-heart"
+        }`}
         style={{ marginRight: "0.2rem", fontSize: "1rem" }}
       ></i>
       {isFavoriting ? "Unfavorite" : "Favorite"} ({favCount})

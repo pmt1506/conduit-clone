@@ -31,22 +31,31 @@ const Articles_View = () => {
         const articleResponse = await axios.get(
           `https://api.realworld.io/api/articles/${slug}`
         );
+        console.log("Article Data:", articleResponse.data.article);
         setArticle(articleResponse.data.article);
 
-        const authorProfileResponse = await axios.get(
-          `https://api.realworld.io/api/profiles/${articleResponse.data.article.author.username}`,
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        );
-        setUser(authorProfileResponse.data.profile);
-        setIsFollowing(authorProfileResponse.data.profile.following);
+        if (userToken) {
+          const authorProfileResponse = await axios.get(
+            `https://api.realworld.io/api/profiles/${articleResponse.data.article.author.username}`,
+            {
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
+          console.log(
+            "Author Profile Data:",
+            authorProfileResponse.data.profile
+          );
+          setUser(authorProfileResponse.data.profile);
+          setIsFollowing(authorProfileResponse.data.profile.following);
 
-        fetchUserInfo(userToken); //for getting user's image
+          fetchUserInfo(userToken); //for getting user's image
 
-        fetchComments(); // Move the comment fetching logic here
+          fetchComments(); // Move the comment fetching logic here
+        } else {
+          console.log("User not logged in. Skipping user-specific requests.");
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -141,36 +150,35 @@ const Articles_View = () => {
     navigate(`/editor/${slug}`);
   };
 
-  if (!article || !user) {
-    return <div className="container">Loading...</div>;
-  }
+  const formattedDate = article
+    ? new Date(article.createdAt).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
 
-  const formattedDate = new Date(article.createdAt).toLocaleDateString(
-    "en-US",
-    {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    }
-  );
+  useEffect(() => {
+    console.log(user);
+  });
 
   return (
     <div className="article-page">
       <div className="banner">
         <div className="container">
-          <h1>{article.title}</h1>
+          <h1>{article?.title}</h1>
           <div className="article-meta_1">
-            <a href={`/@${article.author.username}`}>
+            <a href={`/@${article?.author?.username}`}>
               <img
-                src={article.author.image}
+                src={article?.author?.image}
                 alt=""
                 width="32px"
                 height="32px"
               />
             </a>
             <div className="info">
-              <a href={`/@${article.author.username}`}>
-                {article.author.username}
+              <a href={`/@${article?.author?.username}`}>
+                {article?.author?.username}
               </a>
               <span className="date">{formattedDate}</span>
             </div>
@@ -213,11 +221,11 @@ const Articles_View = () => {
                 <span>
                   <FollowButton
                     key={isFollowing ? "following" : "notFollowing"}
-                    profileUsername={user.username}
+                    profileUsername={article?.author?.username}
                     onUpdateFollow={handleUpdateFollow}
                     pageStyle="article-button"
                   />
-                  <FavoriteButton articleSlug={article.slug} />
+                  <FavoriteButton articleSlug={article?.slug} />
                 </span>
               )}
             </span>
@@ -228,10 +236,10 @@ const Articles_View = () => {
         <div className="row article-content">
           <div className="col-md-12">
             <div>
-              <p>{article.body}</p>
+              <p>{article?.body}</p>
             </div>
             <ul className="tag-list">
-              {article.tagList.map((tag) => (
+              {article?.tagList.map((tag) => (
                 <li key={tag} className="tag-default tag-pill tag-outline">
                   {tag}
                 </li>
@@ -242,17 +250,17 @@ const Articles_View = () => {
         <hr />
         <div className="article-actions">
           <div className="article-meta_2">
-            <a href={`/@${article.author.username}`}>
+            <a href={`/@${article?.author?.username}`}>
               <img
-                src={article.author.image}
+                src={article?.author?.image}
                 alt=""
                 width="32px"
                 height="32px"
               />
             </a>
             <div className="info">
-              <a href={`/@${article.author.username}`}>
-                {article.author.username}
+              <a href={`/@${article?.author?.username}`}>
+                {article?.author?.username}
               </a>
               <span className="date">{formattedDate}</span>
             </div>
@@ -295,11 +303,11 @@ const Articles_View = () => {
                 <span>
                   <FollowButton
                     key={isFollowing ? "following" : "notFollowing"}
-                    profileUsername={user.username}
+                    profileUsername={article?.author?.username}
                     onUpdateFollow={handleUpdateFollow}
                     pageStyle="article-button"
                   />
-                  <FavoriteButton articleSlug={article.slug} />
+                  <FavoriteButton articleSlug={article?.slug} />
                 </span>
               )}
             </span>
