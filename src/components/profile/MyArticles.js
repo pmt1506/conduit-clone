@@ -31,7 +31,7 @@ const MyArticles = ({ username }) => {
         }
       );
       setMyArticles(response.data.articles);
-      // Calculate total pages based on the total articles and articles per page
+      // Calculate total pages based on the total articles count from the API response
       setTotalPages(Math.ceil(response.data.articlesCount / articlesPerPage));
     } catch (error) {
       console.error("Error fetching my articles:", error);

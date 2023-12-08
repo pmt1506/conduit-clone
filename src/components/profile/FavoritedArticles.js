@@ -16,7 +16,7 @@ const FavoritedArticles = ({
   const [totalPages, setTotalPages] = useState(1);
 
   // Assuming you have a reasonable value for articlesPerPage
-  const articlesPerPage = 10;
+  const articlesPerPage = 5;
 
   const userToken = localStorage.getItem("userToken");
 
@@ -31,31 +31,27 @@ const FavoritedArticles = ({
       let apiUrl;
 
       if (isOwnProfile) {
-        // If it's your own profile, fetch all favorited articles
         apiUrl = `https://api.realworld.io/api/articles?favorited=${username}&limit=${articlesPerPage}&offset=${offset}`;
       } else {
-        // If it's not your profile, fetch only favorited articles of the specific author
         apiUrl = `https://api.realworld.io/api/articles?author=${username}&favorited=${authenticatedUser.username}&limit=${articlesPerPage}&offset=${offset}`;
       }
 
       const headers = {};
 
-      // If userToken is present, add the Authorization header
       if (userToken) {
         headers.Authorization = `Bearer ${userToken}`;
       }
 
       const response = await axios.get(apiUrl, { headers });
 
-      // Filter articles to include only those favorited by the logged-in user
+      // Use the total articles count from the API response
+      setTotalPages(Math.ceil(response.data.articlesCount / articlesPerPage));
+
       const userFavoritedArticles = response.data.articles.filter(
         (article) => article.favorited
       );
 
       setFavoritedArticles(userFavoritedArticles);
-
-      // Calculate total pages based on the total user favorited articles and articles per page
-      setTotalPages(Math.ceil(userFavoritedArticles.length / articlesPerPage));
     } catch (error) {
       console.error("Error fetching favorited articles:", error);
     } finally {
