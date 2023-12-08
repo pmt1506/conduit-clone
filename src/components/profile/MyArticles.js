@@ -1,57 +1,57 @@
+// MyArticles.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Favorite from "./Favorite";
-import Pagination from "./Pagination";
+import Favorite from "../home/Favorite";
+import Pagination from "../home/Pagination";
 
-
-const YourFeed = () => {
-  const [articles, setArticles] = useState([]);
+const MyArticles = ({ username }) => {
+  const [myArticles, setMyArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const articlesPerPage = 10; // Define articlesPerPage as a constant
+  // Assuming you have a reasonable value for articlesPerPage
+  const articlesPerPage = 10;
+
+  const userToken = localStorage.getItem("userToken");
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  const fetchArticles = async (offset) => {
+  const fetchMyArticles = async (offset) => {
     try {
       setLoading(true);
-      const userToken = localStorage.getItem("userToken");
       const response = await axios.get(
-        `https://api.realworld.io/api/articles/feed?limit=${articlesPerPage}&offset=${offset}`,
+        `https://api.realworld.io/api/articles?author=${username}&limit=${articlesPerPage}&offset=${offset}`,
         {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+          headers: userToken ? { Authorization: `Bearer ${userToken}` } : {},
         }
       );
-      setArticles(response.data.articles);
-      console.log("Total Your Feed Articles: ", response.data.articlesCount);
-
+      setMyArticles(response.data.articles);
+      // Calculate total pages based on the total articles and articles per page
       setTotalPages(Math.ceil(response.data.articlesCount / articlesPerPage));
     } catch (error) {
-      console.error("Error fetching articles:", error);
+      console.error("Error fetching my articles:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    const offset = (currentPage - 1) * articlesPerPage;
-    fetchArticles(offset);
-  }, [currentPage]);
+    fetchMyArticles(0); // Initial fetch with offset 0
+  }, [username, userToken]);
 
   const handleUpdateFavorite = (updatedArticle) => {
-    const updatedIndex = articles.findIndex(
+    // Find the index of the updated article in the state
+    const updatedIndex = myArticles.findIndex(
       (article) => article.slug === updatedArticle.slug
     );
 
     if (updatedIndex !== -1) {
-      setArticles((prevArticles) => {
+      // Update the state with the modified article
+      setMyArticles((prevArticles) => {
         const newArticles = [...prevArticles];
         newArticles[updatedIndex] = updatedArticle;
         return newArticles;
@@ -62,9 +62,8 @@ const YourFeed = () => {
   const handlePageChange = (pageNumber) => {
     const newOffset = (pageNumber - 1) * articlesPerPage;
     setCurrentPage(pageNumber);
-    fetchArticles(newOffset);
+    fetchMyArticles(newOffset);
   };
-
 
   return (
     <div>
@@ -72,8 +71,8 @@ const YourFeed = () => {
         <div className="mt-3">Loading articles...</div>
       ) : (
         <>
-          {articles.length > 0 ? (
-            articles.map((article) => (
+          {myArticles.length > 0 ? (
+            myArticles.map((article) => (
               <div key={article.slug} className="article-preview">
                 <div className="article-meta">
                   <a href={`/@${article.author.username}`}>
@@ -132,4 +131,4 @@ const YourFeed = () => {
   );
 };
 
-export default YourFeed;
+export default MyArticles;
