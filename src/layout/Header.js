@@ -96,12 +96,12 @@ const Header = React.memo(() => {
             // Display this content when user is not logged in
             <>
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <NavLink className="nav-link" href="/login">
+                <NavLink className="nav-link" to="/login">
                   Sign in
                 </NavLink>
               </li>
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <a className="nav-link" href="/register">
+                <a className="nav-link" to="/register">
                   Sign up
                 </a>
               </li>
