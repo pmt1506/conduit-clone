@@ -35,6 +35,12 @@ const FollowButton = ({ profileUsername = "", onUpdateFollow, pageStyle }) => {
     try {
       setIsToggling(true);
 
+      if (!userToken) {
+        // If not logged in, navigate to the login page
+        window.location.href = "/login";
+        return;
+      }
+
       if (isFollowing) {
         // If already following, perform unfollow using DELETE
         await axios.delete(

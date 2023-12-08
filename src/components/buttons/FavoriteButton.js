@@ -53,6 +53,12 @@ const FavoriteButton = ({ articleSlug }) => {
     try {
       setIsToggling(true);
 
+      if (!userToken) {
+        // If not logged in, navigate to the login page
+        window.location.href = "/login";
+        return;
+      }
+
       if (isFavoriting) {
         // If already favorited, perform unfavorite using DELETE
         await axios.delete(
