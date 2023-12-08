@@ -6,6 +6,7 @@ import "../../css/Create_Articles.css";
 const Create_Articles = () => {
   const userToken = localStorage.getItem("userToken") || "";
   const navigate = useNavigate(); // Initialize navigate
+  
 
   const [articleData, setArticleData] = useState({
     title: "",

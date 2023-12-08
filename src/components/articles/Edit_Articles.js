@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { PuffLoader } from "react-spinners"; // Import the loader component
 
 const Edit_Articles = () => {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ const Edit_Articles = () => {
     title: "",
     description: "",
     body: "",
-    tags: "", // Initialize tags as an empty string
+    tags: "",
   });
 
   const [tagList, setTagList] = useState([]);
@@ -31,7 +32,7 @@ const Edit_Articles = () => {
           title: article.title,
           description: article.description,
           body: article.body,
-          tags: "", // Set tags to an empty string onload
+          tags: "",
         });
 
         setTagList(article.tagList);
@@ -66,7 +67,9 @@ const Edit_Articles = () => {
   };
 
   const removeTag = (tagToRemove) => {
-    setTagList((prevTagList) => prevTagList.filter((tag) => tag !== tagToRemove));
+    setTagList((prevTagList) =>
+      prevTagList.filter((tag) => tag !== tagToRemove)
+    );
   };
 
   const handlePublishArticle = async () => {
@@ -99,83 +102,88 @@ const Edit_Articles = () => {
     }
   };
 
-  if (loading) {
-    return <div className="container">Loading...</div>;
-  }
-
   return (
     <div className="editor-page">
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-10 offset-md-1 col-xs-12">
-            <form>
-              <fieldset>
-                <fieldset className="form-group">
-                  <label htmlFor="title">Article Title</label>
-                  <input
-                    type="text"
-                    className="form-control form-control-lg"
-                    placeholder="Article Title"
-                    name="title"
-                    value={articleData.title}
-                    onChange={handleInputChange}
-                    style={{fontSize:'16px'}}
-                  />
+      {loading ? (
+        <div className="loading-spinner">
+          <PuffLoader color={"#36D7B7"} loading={loading} size={150} />
+        </div>
+      ) : (
+        <div className="container page">
+          <div className="row">
+            <div className="col-md-10 offset-md-1 col-xs-12">
+              <form>
+                <fieldset>
+                  <fieldset className="form-group">
+                    <label htmlFor="title">Article Title</label>
+                    <input
+                      type="text"
+                      className="form-control form-control-lg"
+                      placeholder="Article Title"
+                      name="title"
+                      value={articleData.title}
+                      onChange={handleInputChange}
+                      style={{ fontSize: "16px" }}
+                    />
+                  </fieldset>
+                  <fieldset className="form-group">
+                    <label htmlFor="description">Description</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="What's this article about?"
+                      name="description"
+                      value={articleData.description}
+                      onChange={handleInputChange}
+                    />
+                  </fieldset>
+                  <fieldset className="form-group">
+                    <label htmlFor="body">Article Body</label>
+                    <textarea
+                      className="form-control"
+                      rows="8"
+                      placeholder="Write your article (in markdown)"
+                      name="body"
+                      value={articleData.body}
+                      onChange={handleInputChange}
+                    ></textarea>
+                  </fieldset>
+                  <fieldset className="form-group">
+                    <label htmlFor="tags">Tags</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter tags and press Enter"
+                      name="tags"
+                      value={articleData.tags}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                    />
+                    <div className="tag-list mt-1">
+                      {tagList.map((tag, index) => (
+                        <span key={index} className="tag-default tag-pill">
+                          <i
+                            className="bi bi-x"
+                            onClick={() => removeTag(tag)}
+                          ></i>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <button
+                    className="btn btn-lg btn-success btn-primary ml-auto float-end"
+                    type="button"
+                    onClick={handlePublishArticle}
+                  >
+                    Publish Article
+                  </button>
                 </fieldset>
-                <fieldset className="form-group">
-                  <label htmlFor="description">Description</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="What's this article about?"
-                    name="description"
-                    value={articleData.description}
-                    onChange={handleInputChange}
-                  />
-                </fieldset>
-                <fieldset className="form-group">
-                  <label htmlFor="body">Article Body</label>
-                  <textarea
-                    className="form-control"
-                    rows="8"
-                    placeholder="Write your article (in markdown)"
-                    name="body"
-                    value={articleData.body}
-                    onChange={handleInputChange}
-                  ></textarea>
-                </fieldset>
-                <fieldset className="form-group">
-                  <label htmlFor="tags">Tags</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter tags and press Enter"
-                    name="tags"
-                    value={articleData.tags}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                  />
-                  <div className="tag-list mt-1">
-                    {tagList.map((tag, index) => (
-                      <span key={index} className="tag-default tag-pill">
-                        <i className="bi bi-x" onClick={() => removeTag(tag)}></i>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </fieldset>
-                <button
-                  className="btn btn-lg btn-success btn-primary ml-auto float-end"
-                  type="button"
-                  onClick={handlePublishArticle}
-                >
-                  Publish Article
-                </button>
-              </fieldset>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

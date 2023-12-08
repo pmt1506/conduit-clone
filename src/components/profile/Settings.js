@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../../css/Settings.css";
 import { useNavigate } from "react-router-dom";
+import { BarLoader } from "react-spinners";
 
 const Settings = () => {
   const [user, setUser] = useState(null);
@@ -10,6 +11,7 @@ const Settings = () => {
   const [bio, setBio] = useState("");
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState(""); // New password field
+  const [loading, setLoading] = useState(true); // New loading state
 
   const navigate = useNavigate();
 
@@ -55,6 +57,9 @@ const Settings = () => {
         .catch((error) => {
           // Handle error
           console.error("Error fetching user data:", error);
+        })
+        .finally(() => {
+          setLoading(false); // Set loading to false when data is fetched (success or error)
         });
     }
   }, []);
@@ -63,6 +68,8 @@ const Settings = () => {
     e.preventDefault();
 
     try {
+      setLoading(true); // Set loading to true when making the update request
+
       const response = await axios.put(
         "https://api.realworld.io/api/user",
         {
@@ -81,23 +88,15 @@ const Settings = () => {
         }
       );
 
-      // Assuming the API returns a user object with a new token upon successful update
       const updatedUser = response.data.user;
       const newToken = response.data.user.token;
 
-      // Update the user state with the new data
       setUser(updatedUser);
-
-      // Update the token in localStorage with the new token
       localStorage.setItem("userToken", newToken);
 
-      // Display updated user's data to console
       console.log("Updated User:", updatedUser);
-
-      // Optionally, you can display a success message to the user
       console.log("Settings updated successfully!");
 
-      // Set success message in the state
       setUpdateStatus({
         success: true,
         message: "Settings updated successfully!",
@@ -108,11 +107,12 @@ const Settings = () => {
       console.error("Error status:", error.response.status);
       console.error("Error data:", error.response.data);
 
-      // Set failure message in the state
       setUpdateStatus({
         success: false,
         message: "Failed to update settings. Please try again.",
       });
+    } finally {
+      setLoading(false); // Set loading to false when the update request is complete
     }
   };
 
@@ -129,61 +129,75 @@ const Settings = () => {
         <div className="row">
           <div className="offset-md-3 col-xs-12 setting-container">
             <h1 className="text-center">Settings</h1>
-            <form onSubmit={handleUpdate}>
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="URL of profile picture"
-                  value={profilePictureLink}
-                  onChange={(e) => setProfilePictureLink(e.target.value)}
+            {loading ? ( // Show loader when data is being fetched
+              <div className="loading-spinner">
+                <BarLoader
+                  color={"#36D7B7"}
+                  loading={loading}
+                  size={15}
                 />
               </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <textarea
-                  className="form-control bio"
-                  rows="6"
-                  placeholder="Short bio about you"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                ></textarea>
-              </div>
-              <div className="form-group">
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                {/* New password field */}
-                <input
-                  type="password"
-                  placeholder="New Password"
-                  className="form-control form-control-lg"
-                  style={{ color: "#55595c", height: "50px", fontSize: "16px" }}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-              </div>
-              <button
-                type="submit"
-                className="btn btn-lg btn-primary float-end btn-setting"
-              >
-                Update Settings
-              </button>
-            </form>
+            ) : (
+              <form onSubmit={handleUpdate}>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="URL of profile picture"
+                    value={profilePictureLink}
+                    onChange={(e) => setProfilePictureLink(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <textarea
+                    className="form-control bio"
+                    rows="6"
+                    placeholder="Short bio about you"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                  ></textarea>
+                </div>
+                <div className="form-group">
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  {/* New password field */}
+                  <input
+                    type="password"
+                    placeholder="New Password"
+                    className="form-control form-control-lg"
+                    style={{
+                      color: "#55595c",
+                      height: "50px",
+                      fontSize: "16px",
+                    }}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="btn btn-lg btn-primary float-end btn-setting"
+                >
+                  Update Settings
+                </button>
+              </form>
+            )}
             <div
               className="text-center"
               style={{

@@ -10,6 +10,7 @@ import Profile from "./components/profile/Profile";
 import Articles_View from "./components/articles/Articles_View";
 import Create_Articles from "./components/articles/Create_Articles";
 import Edit_Articles from "./components/articles/Edit_Articles";
+import './css/Loader.css';
 
 function App() {
   return (

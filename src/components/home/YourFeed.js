@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Favorite from "./Favorite";
 import Pagination from "./Pagination";
-
+import { BarLoader } from "react-spinners";
 
 const YourFeed = () => {
   const [articles, setArticles] = useState([]);
@@ -65,11 +65,12 @@ const YourFeed = () => {
     fetchArticles(newOffset);
   };
 
-
   return (
     <div>
       {loading ? (
-        <div className="mt-3">Loading articles...</div>
+        <div className="loading-spinner">
+          <BarLoader color={"#36D7B7"} loading={loading} size={150} />
+        </div>
       ) : (
         <>
           {articles.length > 0 ? (
