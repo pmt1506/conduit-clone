@@ -316,40 +316,52 @@ const Articles_View = () => {
         {/* Comment */}
         <div className="row mb-5">
           <div className="col-xs-12 col-md-8 offset-md-2">
-            <form className="card comment-form" onSubmit={handleCommentSubmit}>
-              <fieldset>
-                <div className="card-block">
-                  <textarea
-                    className="form-control"
-                    placeholder="Write a comment..."
-                    rows="3"
-                    value={newComment}
-                    onChange={handleCommentChange}
-                  ></textarea>
-                </div>
-                <div className="card-footer">
-                  {userInfo && userInfo.image && (
-                    <img
-                      className="comment-author-img"
-                      src={userInfo.image}
-                      alt="user's image"
+            {userToken ? (
+              <>
+                <form
+                  className="card comment-form"
+                  onSubmit={handleCommentSubmit}
+                >
+                  <fieldset>
+                    <div className="card-block">
+                      <textarea
+                        className="form-control"
+                        placeholder="Write a comment..."
+                        rows="3"
+                        value={newComment}
+                        onChange={handleCommentChange}
+                      ></textarea>
+                    </div>
+                    <div className="card-footer">
+                      {userInfo && userInfo.image && (
+                        <img
+                          className="comment-author-img"
+                          src={userInfo.image}
+                          alt="user's image"
+                        />
+                      )}
+                      <button className="btn btn-sm btn-success" type="submit">
+                        Post Comment
+                      </button>
+                    </div>
+                  </fieldset>
+                </form>
+                <div className="comments">
+                  {comments.map((comment) => (
+                    <Comment
+                      key={comment.id}
+                      comment={comment}
+                      fetchComments={fetchComments}
                     />
-                  )}
-                  <button className="btn btn-sm btn-success" type="submit">
-                    Post Comment
-                  </button>
+                  ))}
                 </div>
-              </fieldset>
-            </form>
-            <div className="comments">
-              {comments.map((comment) => (
-                <Comment
-                  key={comment.id}
-                  comment={comment}
-                  fetchComments={fetchComments}
-                />
-              ))}
-            </div>
+              </>
+            ) : (
+              <div className="alert alert-info" role="alert">
+                <a href="/login">Login</a> or <a href="/register">Sign up </a>
+                to see and post comments.
+              </div>
+            )}
           </div>
         </div>
       </div>

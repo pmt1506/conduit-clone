@@ -101,9 +101,9 @@ const Header = React.memo(() => {
                 </NavLink>
               </li>
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <a className="nav-link" to="/register">
+                <NavLink className="nav-link" to="/register">
                   Sign up
-                </a>
+                </NavLink>
               </li>
             </>
           )}
