@@ -80,7 +80,7 @@ const GlobalFeed = ({ selectedTag }) => {
     <div>
       {loading ? (
         <div className="loading-spinner">
-          <BarLoader color={"#36D7B7"} loading={loading} size={150} />
+          <BarLoader color={"#36D7B7"} loading={loading} width={300} />
         </div>
       ) : (
         <>

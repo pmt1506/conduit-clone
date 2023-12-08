@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import "../../css/Articles.css";
 import Comment from "./Comment";
 import axios from "axios";
+import { BarLoader, PuffLoader } from "react-spinners";
 
 const Articles_View = () => {
   const [user, setUser] = useState(null);
@@ -17,6 +18,9 @@ const Articles_View = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [userInfo, setUserInfo] = useState(null);
+
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [commentsLoading, setCommentsLoading] = useState(true); // Add loading state for comments
 
   const isArticleOwner =
     user && userInfo && user.username === userInfo.username;
@@ -58,6 +62,9 @@ const Articles_View = () => {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        // Set loading to false after fetch is complete
+        setLoading(false);
       }
     };
 
@@ -125,6 +132,9 @@ const Articles_View = () => {
       setComments(commentsResponse.data.comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
+    } finally {
+      // Set comments loading to false after comment fetch is complete
+      setCommentsLoading(false);
     }
   };
 
@@ -158,213 +168,237 @@ const Articles_View = () => {
       })
     : null;
 
-  useEffect(() => {
-    console.log(user);
-  });
-
   return (
     <div className="article-page">
-      <div className="banner">
-        <div className="container">
-          <h1>{article?.title}</h1>
-          <div className="article-meta_1">
-            <a href={`/@${article?.author?.username}`}>
-              <img
-                src={article?.author?.image}
-                alt=""
-                width="32px"
-                height="32px"
-              />
-            </a>
-            <div className="info">
-              <a href={`/@${article?.author?.username}`}>
-                {article?.author?.username}
-              </a>
-              <span className="date">{formattedDate}</span>
-            </div>
-            <span>
-              {isArticleOwner ? (
-                <span>
-                  {/* Add Edit and Delete buttons here */}
-                  <button
-                    className="btn btn-sm btn-outline-primary"
-                    onClick={handleEditArticle}
-                    style={{
-                      height: "31px",
-                      lineHeight: "21px",
-                      marginLeft: "5px",
-                    }}
-                  >
-                    <i
-                      className="bi bi-pencil"
-                      style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                    ></i>
-                    Edit Article
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline-danger ml-2"
-                    onClick={handleDeleteArticle}
-                    style={{
-                      height: "31px",
-                      lineHeight: "21px",
-                      marginLeft: "5px",
-                    }}
-                  >
-                    <i
-                      className="bi bi-trash-fill"
-                      style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                    ></i>
-                    Delete Article
-                  </button>
-                </span>
-              ) : (
-                <span>
-                  <FollowButton
-                    key={isFollowing ? "following" : "notFollowing"}
-                    profileUsername={article?.author?.username}
-                    onUpdateFollow={handleUpdateFollow}
-                    pageStyle="article-button"
+      {loading ? (
+        <div className="loading-spinner">
+          <PuffLoader color={"#36D7B7"} loading={loading} size={150} />
+        </div>
+      ) : (
+        <div>
+          <div className="banner">
+            <div className="container">
+              <h1>{article?.title}</h1>
+              <div className="article-meta_1">
+                <a href={`/@${article?.author?.username}`}>
+                  <img
+                    src={article?.author?.image}
+                    alt=""
+                    width="32px"
+                    height="32px"
                   />
-                  <FavoriteButton articleSlug={article?.slug} />
-                </span>
-              )}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="container">
-        <div className="row article-content">
-          <div className="col-md-12">
-            <div>
-              <p>{article?.body}</p>
-            </div>
-            <ul className="tag-list">
-              {article?.tagList.map((tag) => (
-                <li key={tag} className="tag-default tag-pill tag-outline">
-                  {tag}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <hr />
-        <div className="article-actions">
-          <div className="article-meta_2">
-            <a href={`/@${article?.author?.username}`}>
-              <img
-                src={article?.author?.image}
-                alt=""
-                width="32px"
-                height="32px"
-              />
-            </a>
-            <div className="info">
-              <a href={`/@${article?.author?.username}`}>
-                {article?.author?.username}
-              </a>
-              <span className="date">{formattedDate}</span>
-            </div>
-            <span>
-              {isArticleOwner ? (
-                <span>
-                  {/* Add Edit and Delete buttons here */}
-                  <button
-                    className="btn btn-sm btn-outline-primary"
-                    onClick={handleEditArticle}
-                    style={{
-                      height: "31px",
-                      lineHeight: "21px",
-                      marginLeft: "5px",
-                    }}
-                  >
-                    <i
-                      className="bi bi-pencil"
-                      style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                    ></i>
-                    Edit Article
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline-danger ml-2"
-                    onClick={handleDeleteArticle}
-                    style={{
-                      height: "31px",
-                      lineHeight: "21px",
-                      marginLeft: "5px",
-                    }}
-                  >
-                    <i
-                      className="bi bi-trash-fill"
-                      style={{ marginRight: "0.2rem", fontSize: "1rem" }}
-                    ></i>
-                    Delete Article
-                  </button>
-                </span>
-              ) : (
-                <span>
-                  <FollowButton
-                    key={isFollowing ? "following" : "notFollowing"}
-                    profileUsername={article?.author?.username}
-                    onUpdateFollow={handleUpdateFollow}
-                    pageStyle="article-button"
-                  />
-                  <FavoriteButton articleSlug={article?.slug} />
-                </span>
-              )}
-            </span>
-          </div>
-        </div>
-        {/* Comment */}
-        <div className="row mb-5">
-          <div className="col-xs-12 col-md-8 offset-md-2">
-            {userToken ? (
-              <>
-                <form
-                  className="card comment-form"
-                  onSubmit={handleCommentSubmit}
-                >
-                  <fieldset>
-                    <div className="card-block">
-                      <textarea
-                        className="form-control"
-                        placeholder="Write a comment..."
-                        rows="3"
-                        value={newComment}
-                        onChange={handleCommentChange}
-                      ></textarea>
-                    </div>
-                    <div className="card-footer">
-                      {userInfo && userInfo.image && (
-                        <img
-                          className="comment-author-img"
-                          src={userInfo.image}
-                          alt="user's image"
-                        />
-                      )}
-                      <button className="btn btn-sm btn-success" type="submit">
-                        Post Comment
-                      </button>
-                    </div>
-                  </fieldset>
-                </form>
-                <div className="comments">
-                  {comments.map((comment) => (
-                    <Comment
-                      key={comment.id}
-                      comment={comment}
-                      fetchComments={fetchComments}
-                    />
-                  ))}
+                </a>
+                <div className="info">
+                  <a href={`/@${article?.author?.username}`}>
+                    {article?.author?.username}
+                  </a>
+                  <span className="date">{formattedDate}</span>
                 </div>
-              </>
-            ) : (
-              <div className="alert alert-info" role="alert">
-                <a href="/login">Login</a> or <a href="/register">Sign up </a>
-                to see and post comments.
+                <span>
+                  {isArticleOwner ? (
+                    <span>
+                      <button
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={handleEditArticle}
+                        style={{
+                          height: "31px",
+                          lineHeight: "21px",
+                          marginLeft: "5px",
+                        }}
+                      >
+                        <i
+                          className="bi bi-pencil"
+                          style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                        ></i>
+                        Edit Article
+                      </button>
+                      <button
+                        className="btn btn-sm btn-outline-danger ml-2"
+                        onClick={handleDeleteArticle}
+                        style={{
+                          height: "31px",
+                          lineHeight: "21px",
+                          marginLeft: "5px",
+                        }}
+                      >
+                        <i
+                          className="bi bi-trash-fill"
+                          style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                        ></i>
+                        Delete Article
+                      </button>
+                    </span>
+                  ) : (
+                    <span>
+                      <FollowButton
+                        key={isFollowing ? "following" : "notFollowing"}
+                        profileUsername={article?.author?.username}
+                        onUpdateFollow={handleUpdateFollow}
+                        pageStyle="article-button"
+                      />
+                      <FavoriteButton articleSlug={article?.slug} />
+                    </span>
+                  )}
+                </span>
               </div>
-            )}
+            </div>
+          </div>
+          <div className="container">
+            <div className="row article-content">
+              <div className="col-md-12">
+                <div>
+                  <p>{article?.body}</p>
+                </div>
+                <ul className="tag-list">
+                  {article?.tagList.map((tag) => (
+                    <li key={tag} className="tag-default tag-pill tag-outline">
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <hr />
+            <div className="article-actions">
+              <div className="article-meta_2">
+                <a href={`/@${article?.author?.username}`}>
+                  <img
+                    src={article?.author?.image}
+                    alt=""
+                    width="32px"
+                    height="32px"
+                  />
+                </a>
+                <div className="info">
+                  <a href={`/@${article?.author?.username}`}>
+                    {article?.author?.username}
+                  </a>
+                  <span className="date">{formattedDate}</span>
+                </div>
+                <span>
+                  {isArticleOwner ? (
+                    <span>
+                      <button
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={handleEditArticle}
+                        style={{
+                          height: "31px",
+                          lineHeight: "21px",
+                          marginLeft: "5px",
+                        }}
+                      >
+                        <i
+                          className="bi bi-pencil"
+                          style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                        ></i>
+                        Edit Article
+                      </button>
+                      <button
+                        className="btn btn-sm btn-outline-danger ml-2"
+                        onClick={handleDeleteArticle}
+                        style={{
+                          height: "31px",
+                          lineHeight: "21px",
+                          marginLeft: "5px",
+                        }}
+                      >
+                        <i
+                          className="bi bi-trash-fill"
+                          style={{ marginRight: "0.2rem", fontSize: "1rem" }}
+                        ></i>
+                        Delete Article
+                      </button>
+                    </span>
+                  ) : (
+                    <span>
+                      <FollowButton
+                        key={isFollowing ? "following" : "notFollowing"}
+                        profileUsername={article?.author?.username}
+                        onUpdateFollow={handleUpdateFollow}
+                        pageStyle="article-button"
+                      />
+                      <FavoriteButton articleSlug={article?.slug} />
+                    </span>
+                  )}
+                </span>
+              </div>
+            </div>
+            {/* Comment */}
+            <div className="row mb-5">
+              <div className="col-xs-12 col-md-8 offset-md-2">
+                {userToken ? (
+                  <>
+                    <form
+                      className="card comment-form"
+                      onSubmit={handleCommentSubmit}
+                    >
+                      <fieldset>
+                        <div className="card-block">
+                          <textarea
+                            className="form-control"
+                            placeholder="Write a comment..."
+                            rows="3"
+                            value={newComment}
+                            onChange={handleCommentChange}
+                          ></textarea>
+                        </div>
+                        <div className="card-footer">
+                          {userInfo && userInfo.image && (
+                            <img
+                              className="comment-author-img"
+                              src={userInfo.image}
+                              alt="user's image"
+                            />
+                          )}
+                          <button
+                            className="btn btn-sm btn-success"
+                            type="submit"
+                          >
+                            Post Comment
+                          </button>
+                        </div>
+                      </fieldset>
+                    </form>
+                    {commentsLoading ? (
+                      <div
+                        className="spinner"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          height: "10vh",
+                        }}
+                      >
+                        <BarLoader
+                          color={"#36D7B7"}
+                          loading={commentsLoading}
+                          width={300}
+                        />
+                      </div>
+                    ) : (
+                      <div className="comments mt-4">
+                        {comments.map((comment) => (
+                          <Comment
+                            key={comment.id}
+                            comment={comment}
+                            fetchComments={fetchComments}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="alert alert-info" role="alert">
+                    <a href="/login">Login</a> or{" "}
+                    <a href="/register">Sign up </a>
+                    to see and post comments.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

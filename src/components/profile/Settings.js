@@ -134,7 +134,7 @@ const Settings = () => {
                 <BarLoader
                   color={"#36D7B7"}
                   loading={loading}
-                  size={15}
+                  width={300}
                 />
               </div>
             ) : (
