@@ -68,7 +68,7 @@ const Settings = () => {
     e.preventDefault();
 
     try {
-      setLoading(true); // Set loading to true when making the update request
+      setLoading(true);
 
       const response = await axios.put(
         "https://api.realworld.io/api/user",
@@ -97,22 +97,11 @@ const Settings = () => {
       console.log("Updated User:", updatedUser);
       console.log("Settings updated successfully!");
 
-      setUpdateStatus({
-        success: true,
-        message: "Settings updated successfully!",
-      });
-
-      navigate(`/${response.user.username}`);
+      navigate(`/@${updatedUser.username}`);
     } catch (error) {
-      console.error("Error status:", error.response.status);
-      console.error("Error data:", error.response.data);
-
-      setUpdateStatus({
-        success: false,
-        message: "Failed to update settings. Please try again.",
-      });
+      console.error("Error:", error);
     } finally {
-      setLoading(false); // Set loading to false when the update request is complete
+      setLoading(false);
     }
   };
 
@@ -131,11 +120,7 @@ const Settings = () => {
             <h1 className="text-center">Settings</h1>
             {loading ? ( // Show loader when data is being fetched
               <div className="loading-spinner">
-                <BarLoader
-                  color={"#36D7B7"}
-                  loading={loading}
-                  width={300}
-                />
+                <BarLoader color={"#36D7B7"} loading={loading} width={300} />
               </div>
             ) : (
               <form onSubmit={handleUpdate}>
