@@ -3,6 +3,7 @@ import axios from "axios";
 import "../../css/Settings.css";
 import { useNavigate } from "react-router-dom";
 import { BarLoader } from "react-spinners";
+import toast from "react-hot-toast";
 
 const Settings = () => {
   const [user, setUser] = useState(null);
@@ -97,6 +98,8 @@ const Settings = () => {
       console.log("Updated User:", updatedUser);
       console.log("Settings updated successfully!");
 
+      toast.success("Settings updated successfully!");
+
       navigate(`/@${updatedUser.username}`);
     } catch (error) {
       console.error("Error:", error);
@@ -108,8 +111,16 @@ const Settings = () => {
   const handleLogout = () => {
     // Clear session storage
     localStorage.clear();
-    // Redirect to the login page (replace '/login' with the actual path)
-    window.location.href = "/";
+
+    // Display a toast notification for successful logout
+    toast("Logged out successfully!", {
+      icon: "👋",
+    });
+
+    // Redirect to the login page after a short delay
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1500); // Adjust the delay time (in milliseconds) as needed
   };
 
   return (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const FavoriteButton = ({ articleSlug }) => {
   const [isFavoriting, setIsFavoriting] = useState(false);
@@ -94,6 +95,18 @@ const FavoriteButton = ({ articleSlug }) => {
       setIsFavoriting(response.data.article.favorited);
       setFavCount(response.data.article.favoritesCount);
       setCheck(!check); // Toggle the check variable to trigger re-render
+
+      // Display toast notification based on favorited/unfavorited status
+      toast(
+        `${
+          response.data.article.favorited
+            ? "Article Favorited!"
+            : "Article Unfavorited!"
+        }`,
+        {
+          icon: `${response.data.article.favorited ? "❤️" : "💔"}`,
+        }
+      );
     } catch (error) {
       console.error("Error toggling favorite:", error);
     } finally {

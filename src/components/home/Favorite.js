@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const Favorite = ({ articleSlug, onUpdateFavorite, favCount }) => {
   const [isFavorited, setIsFavorited] = useState(false);
@@ -44,6 +45,8 @@ const Favorite = ({ articleSlug, onUpdateFavorite, favCount }) => {
         return;
       }
 
+      let toastMessage = ""; // Initialize toast message variable
+
       if (isFavorited) {
         await axios.delete(
           `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
@@ -53,6 +56,8 @@ const Favorite = ({ articleSlug, onUpdateFavorite, favCount }) => {
             },
           }
         );
+
+        toastMessage = "Article unfavorited";
       } else {
         await axios.post(
           `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
@@ -63,6 +68,8 @@ const Favorite = ({ articleSlug, onUpdateFavorite, favCount }) => {
             },
           }
         );
+
+        toastMessage = "Article favorited";
       }
 
       // Update favorite status after the toggle
@@ -78,7 +85,11 @@ const Favorite = ({ articleSlug, onUpdateFavorite, favCount }) => {
       setIsFavorited(response.data.article.favorited);
       onUpdateFavorite(response.data.article);
 
-      // Log whether it's favorited or not after the toggle
+      // Show toast with heart icon based on favorited status
+      toast(`${toastMessage}`, {
+        icon: `${response.data.article.favorited ? "❤️" : "💔"}`,
+      });
+
       console.log(
         `Article ${
           response.data.article.favorited ? "favorited" : "unfavorited"

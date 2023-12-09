@@ -1,6 +1,7 @@
 // FollowButton.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const FollowButton = ({ profileUsername = "", onUpdateFollow, pageStyle }) => {
   const [isFollowing, setIsFollowing] = useState(false);
@@ -74,6 +75,9 @@ const FollowButton = ({ profileUsername = "", onUpdateFollow, pageStyle }) => {
         }
       );
       onUpdateFollow(response.data.profile);
+
+      // Display toast notification based on follow/unfollow status
+      toast.success(`${isFollowing ? "Unfollowed " : "Followed "} ${profileUsername}`);
     } catch (error) {
       console.error("Error toggling follow:", error);
     } finally {

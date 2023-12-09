@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { PuffLoader } from "react-spinners"; // Import the loader component
+import toast from "react-hot-toast";
 
 const Edit_Articles = () => {
   const navigate = useNavigate();
@@ -97,6 +98,9 @@ const Edit_Articles = () => {
 
       const newSlug = response.data.article.slug;
       navigate(`/article/${newSlug}`);
+
+      // Show success toast
+      toast.success("Article updated successfully!");
     } catch (error) {
       console.error("Error publishing article:", error);
     }
@@ -176,7 +180,7 @@ const Edit_Articles = () => {
                     type="button"
                     onClick={handlePublishArticle}
                   >
-                    Publish Article
+                    Update Article
                   </button>
                 </fieldset>
               </form>

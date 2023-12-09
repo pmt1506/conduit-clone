@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -42,9 +43,17 @@ const Register = () => {
       // Clear error message
       setError("");
 
+      // Show success toast
+      toast.success("Registration successful! Redirecting to login page...", {
+        duration: 3000,
+        icon: "🎉",
+      });
+
       // Redirect to login page with email and password as state parameters
       navigate("/login", { state: { email, password } });
     } catch (error) {
+      // Handle registration errors
+
       if (error.response && error.response.status === 422) {
         // Validation errors
         const validationErrors = error.response.data.errors;

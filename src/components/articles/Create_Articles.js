@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../../css/Create_Articles.css";
+import toast from "react-hot-toast";
 
 const Create_Articles = () => {
   const userToken = localStorage.getItem("userToken") || "";
   const navigate = useNavigate(); // Initialize navigate
-  
 
   const [articleData, setArticleData] = useState({
     title: "",
@@ -75,8 +75,12 @@ const Create_Articles = () => {
         tags: "",
       });
       setTagList([]);
+
+      // Show success toast
+      toast.success("Article published successfully!");
     } catch (error) {
       console.error("Error publishing article:", error);
+      toast.error("Failed to publish article. Please try again.");
     }
   };
 
@@ -97,7 +101,7 @@ const Create_Articles = () => {
                     id="title"
                     value={articleData.title}
                     onChange={handleInputChange}
-                    style={{fontSize:'16px'}}
+                    style={{ fontSize: "16px" }}
                   />
                 </fieldset>
                 <fieldset className="form-group">

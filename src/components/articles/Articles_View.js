@@ -8,6 +8,7 @@ import "../../css/Articles.css";
 import Comment from "./Comment";
 import axios from "axios";
 import { BarLoader, PuffLoader } from "react-spinners";
+import toast from "react-hot-toast";
 
 const Articles_View = () => {
   const [user, setUser] = useState(null);
@@ -140,6 +141,8 @@ const Articles_View = () => {
 
   const handleDeleteArticle = async () => {
     try {
+      const userToken = localStorage.getItem("userToken");
+
       await axios.delete(`https://api.realworld.io/api/articles/${slug}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -148,10 +151,14 @@ const Articles_View = () => {
 
       // Redirect or perform additional actions after successful deletion
       navigate("/");
-      window.location.reload();
+
+      // Show success toast
+      toast.success("Article deleted successfully!");
     } catch (error) {
       console.error("Error deleting article:", error);
-      // Handle error or display a message to the user
+
+      // Show error toast
+      toast.error("Failed to delete article. Please try again.");
     }
   };
 

@@ -87,9 +87,9 @@ const Header = React.memo(() => {
                     marginRight: "0.5rem",
                   }}
                 />
-                <a className="nav-link" href={`/@${userInfo.username}`}>
+                <NavLink className="nav-link" to={`/@${userInfo.username}`}>
                   {userInfo.username}
-                </a>
+                </NavLink>
               </li>
             </>
           ) : (
