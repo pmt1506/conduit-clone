@@ -87,23 +87,23 @@ const Header = React.memo(() => {
                     marginRight: "0.5rem",
                   }}
                 />
-                <a className="nav-link" href={`/@${userInfo.username}`}>
+                <NavLink className="nav-link" to={`/@${userInfo.username}`}>
                   {userInfo.username}
-                </a>
+                </NavLink>
               </li>
             </>
           ) : (
             // Display this content when user is not logged in
             <>
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <NavLink className="nav-link" href="/login">
+                <NavLink className="nav-link" to="/login">
                   Sign in
                 </NavLink>
               </li>
               <li className="nav-item" style={{ marginLeft: "1rem" }}>
-                <a className="nav-link" href="/register">
+                <NavLink className="nav-link" to="/register">
                   Sign up
-                </a>
+                </NavLink>
               </li>
             </>
           )}

@@ -1,36 +1,46 @@
 // FollowButton.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
-const FollowButton = ({ profileUsername, onUpdateFollow, pageStyle }) => {
+const FollowButton = ({ profileUsername = "", onUpdateFollow, pageStyle }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
 
   const userToken = localStorage.getItem("userToken");
 
   useEffect(() => {
-    const fetchFollowStatus = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.realworld.io/api/profiles/${profileUsername}`,
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        );
-        setIsFollowing(response.data.profile.following);
-      } catch (error) {
-        console.error("Error fetching follow status:", error);
-      }
-    };
+    // Check if the user is logged in before fetching follow status
+    if (userToken) {
+      const fetchFollowStatus = async () => {
+        try {
+          const response = await axios.get(
+            `https://api.realworld.io/api/profiles/${profileUsername}`,
+            {
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
+          setIsFollowing(response.data.profile.following);
+        } catch (error) {
+          console.error("Error fetching follow status:", error);
+        }
+      };
 
-    fetchFollowStatus();
+      fetchFollowStatus();
+    }
   }, [profileUsername, userToken]);
 
   const handleFollowToggle = async () => {
     try {
       setIsToggling(true);
+
+      if (!userToken) {
+        // If not logged in, navigate to the login page
+        window.location.href = "/login";
+        return;
+      }
 
       if (isFollowing) {
         // If already following, perform unfollow using DELETE
@@ -65,6 +75,9 @@ const FollowButton = ({ profileUsername, onUpdateFollow, pageStyle }) => {
         }
       );
       onUpdateFollow(response.data.profile);
+
+      // Display toast notification based on follow/unfollow status
+      toast.success(`${isFollowing ? "Unfollowed " : "Followed "} ${profileUsername}`);
     } catch (error) {
       console.error("Error toggling follow:", error);
     } finally {
@@ -78,9 +91,9 @@ const FollowButton = ({ profileUsername, onUpdateFollow, pageStyle }) => {
         isFollowing ? "btn-secondary" : "btn-outline-secondary"
       } ${pageStyle}`}
       onClick={handleFollowToggle}
-      disabled={isToggling}
+      disabled={isToggling || !userToken} // Disable button if user is not logged in
       style={{
-        cursor: isToggling ? "not-allowed" : "pointer",
+        cursor: isToggling || !userToken ? "not-allowed" : "pointer",
         height: "31px",
         lineHeight: "21px",
         marginLeft: "5px",

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../css/Login.css";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -50,11 +51,14 @@ const Login = () => {
       // Store user token in localStorage
       localStorage.setItem("userToken", user.token);
 
-      // Redirect to home page after successful login
-      navigate("/");
+      toast("Logged in successfully!", {
+        icon: "👋",
+      });
 
-      // Reload the page after redirecting (this may help with header errors)
-      window.location.reload();
+      // Redirect to the login page after a short delay
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000); // Adjust the delay time (in milliseconds) as needed
     } catch (error) {
       setError("Invalid email or password. Please try again.");
     }

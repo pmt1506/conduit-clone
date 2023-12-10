@@ -3,15 +3,20 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Favorite from "../home/Favorite";
 import Pagination from "../home/Pagination";
+import { BarLoader } from "react-spinners";
 
-const FavoritedArticles = ({ username }) => {
+const FavoritedArticles = ({
+  username,
+  isOwnProfile = false,
+  authenticatedUser = null,
+}) => {
   const [favoritedArticles, setFavoritedArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   // Assuming you have a reasonable value for articlesPerPage
-  const articlesPerPage = 10;
+  const articlesPerPage = 5;
 
   const userToken = localStorage.getItem("userToken");
 
@@ -23,19 +28,30 @@ const FavoritedArticles = ({ username }) => {
   const fetchFavoritedArticles = async (offset) => {
     try {
       setLoading(true);
-      const apiUrl = `https://api.realworld.io/api/articles?favorited=${username}&limit=${articlesPerPage}&offset=${offset}`;
-      
+      let apiUrl;
+
+      if (isOwnProfile) {
+        apiUrl = `https://api.realworld.io/api/articles?favorited=${username}&limit=${articlesPerPage}&offset=${offset}`;
+      } else {
+        apiUrl = `https://api.realworld.io/api/articles?author=${username}&favorited=${authenticatedUser.username}&limit=${articlesPerPage}&offset=${offset}`;
+      }
+
       const headers = {};
 
-      // If userToken is present, add the Authorization header
       if (userToken) {
         headers.Authorization = `Bearer ${userToken}`;
       }
 
       const response = await axios.get(apiUrl, { headers });
-      setFavoritedArticles(response.data.articles);
-      // Calculate total pages based on the total articles and articles per page
+
+      // Use the total articles count from the API response
       setTotalPages(Math.ceil(response.data.articlesCount / articlesPerPage));
+
+      const userFavoritedArticles = response.data.articles.filter(
+        (article) => article.favorited
+      );
+
+      setFavoritedArticles(userFavoritedArticles);
     } catch (error) {
       console.error("Error fetching favorited articles:", error);
     } finally {
@@ -72,64 +88,54 @@ const FavoritedArticles = ({ username }) => {
   return (
     <div>
       {loading ? (
-        <div className="mt-3">Loading favorited articles...</div>
-      ) : (
-        <>
-          {favoritedArticles.length > 0 ? (
-            favoritedArticles.map((article) => (
-              <div key={article.slug} className="article-preview">
-                <div className="article-meta">
-                  <a href={`/@${article.author.username}`}>
-                    <img
-                      src={article.author.image}
-                      alt={article.author.username}
-                    />
-                  </a>
-                  <div className="info">
-                    <a href={`/@${article.author.username}`} className="author">
-                      {article.author.username}
-                    </a>
-                    <span className="date">
-                      {formatDate(article.createdAt)}
-                    </span>
-                  </div>
-                  <Favorite
-                    articleSlug={article.slug}
-                    onUpdateFavorite={handleUpdateFavorite}
-                    favCount={article.favoritesCount}
-                  />
-                </div>
-
-                <a href={`/article/${article.slug}`} className="preview-link">
-                  <h1>{article.title}</h1>
-                  <p>{article.description}</p>
-                  <div>
-                    <span>Read more...</span>
-                    <ul className="tag-list">
-                      {article.tagList.map((tag) => (
-                        <li
-                          key={tag}
-                          className="tag-default tag-pill tag-outline"
-                        >
-                          {tag}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+        <div className="loading-spinner">
+          <BarLoader color={"#36D7B7"} loading={loading} size={150} />
+        </div>
+      ) : favoritedArticles.length > 0 ? (
+        favoritedArticles.map((article) => (
+          <div key={article.slug} className="article-preview">
+            <div className="article-meta">
+              <a href={`/@${article.author.username}`}>
+                <img src={article.author.image} alt={article.author.username} />
+              </a>
+              <div className="info">
+                <a href={`/@${article.author.username}`} className="author">
+                  {article.author.username}
                 </a>
+                <span className="date">{formatDate(article.createdAt)}</span>
               </div>
-            ))
-          ) : (
-            <div>No favorited articles found</div>
-          )}
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              handlePageChange={handlePageChange}
-            />
-          )}
-        </>
+              <Favorite
+                articleSlug={article.slug}
+                onUpdateFavorite={handleUpdateFavorite}
+                favCount={article.favoritesCount}
+              />
+            </div>
+
+            <a href={`/article/${article.slug}`} className="preview-link">
+              <h1>{article.title}</h1>
+              <p>{article.description}</p>
+              <div>
+                <span>Read more...</span>
+                <ul className="tag-list">
+                  {article.tagList.map((tag) => (
+                    <li key={tag} className="tag-default tag-pill tag-outline">
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </a>
+          </div>
+        ))
+      ) : (
+        <div>No favorited articles found</div>
+      )}
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          handlePageChange={handlePageChange}
+        />
       )}
     </div>
   );

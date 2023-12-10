@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Favorite from "../home/Favorite";
 import Pagination from "../home/Pagination";
+import { BarLoader } from "react-spinners";
 
 const MyArticles = ({ username }) => {
   const [myArticles, setMyArticles] = useState([]);
@@ -11,7 +12,7 @@ const MyArticles = ({ username }) => {
   const [totalPages, setTotalPages] = useState(1);
 
   // Assuming you have a reasonable value for articlesPerPage
-  const articlesPerPage = 10;
+  const articlesPerPage = 5;
 
   const userToken = localStorage.getItem("userToken");
 
@@ -30,7 +31,7 @@ const MyArticles = ({ username }) => {
         }
       );
       setMyArticles(response.data.articles);
-      // Calculate total pages based on the total articles and articles per page
+      // Calculate total pages based on the total articles count from the API response
       setTotalPages(Math.ceil(response.data.articlesCount / articlesPerPage));
     } catch (error) {
       console.error("Error fetching my articles:", error);
@@ -68,7 +69,9 @@ const MyArticles = ({ username }) => {
   return (
     <div>
       {loading ? (
-        <div className="mt-3">Loading articles...</div>
+        <div className="loading-spinner">
+          <BarLoader color={"#36D7B7"} loading={loading} size={150} />
+        </div>
       ) : (
         <>
           {myArticles.length > 0 ? (

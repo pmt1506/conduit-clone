@@ -3,7 +3,7 @@ import React from "react";
 import "../../css/Articles.css";
 import axios from "axios";
 
-const Comment = ({ comment, onReply, fetchComments }) => {
+const Comment = ({ comment, fetchComments }) => {
   const handleDeleteComment = async () => {
     try {
       await axios.delete(
