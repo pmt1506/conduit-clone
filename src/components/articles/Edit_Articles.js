@@ -84,6 +84,9 @@ const Edit_Articles = () => {
         tagList: tagList,
       };
 
+      // Start loading toast immediately
+      const loadingToast = toast.loading("Updating Article...");
+
       const response = await axios.put(
         `https://api.realworld.io/api/articles/${slug}`,
         {
@@ -96,13 +99,20 @@ const Edit_Articles = () => {
         }
       );
 
-      const newSlug = response.data.article.slug;
-      navigate(`/article/${newSlug}`);
+      // Dismiss the loading toast after a short delay (e.g., 500 milliseconds)
+      setTimeout(() => {
+        toast.dismiss(loadingToast);
 
-      // Show success toast
-      toast.success("Article updated successfully!");
+        toast.promise(Promise.resolve(response), {
+          success: <b>Article updated successfully!</b>,
+          error: <b>Error updating article</b>,
+        });
+
+        const newSlug = response.data.article.slug;
+        navigate(`/article/${newSlug}`);
+      }, 500); // Adjust the delay as needed
     } catch (error) {
-      console.error("Error publishing article:", error);
+      console.error("Error updating article:", error);
     }
   };
 

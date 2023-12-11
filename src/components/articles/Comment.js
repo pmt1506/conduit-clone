@@ -1,6 +1,5 @@
-// Comment.js
+// Import necessary libraries and components
 import React, { useEffect, useState } from "react";
-import "../../css/Articles.css";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -26,7 +25,10 @@ const Comment = ({ comment, fetchComments }) => {
 
   const handleDeleteComment = async () => {
     try {
-      await axios.delete(
+      // Start loading toast immediately
+      const loadingToast = toast.loading("Deleting...");
+
+      const response = await axios.delete(
         `https://api.realworld.io/api/articles/${comment.articleSlug}/comments/${comment.id}`,
         {
           headers: {
@@ -34,12 +36,21 @@ const Comment = ({ comment, fetchComments }) => {
           },
         }
       );
-      // After successful deletion, fetch comments again to update the UI
-      fetchComments();
-      toast.success("Comment deleted successfully!");
+
+      // Dismiss the loading toast after a short delay (e.g., 500 milliseconds)
+      setTimeout(() => {
+        toast.dismiss(loadingToast);
+
+        toast.promise(Promise.resolve(response), {
+          success: <b>Comment deleted successfully!</b>,
+          error: <b>Error deleting comment</b>,
+        });
+
+        // After successful deletion, fetch comments again to update the UI
+        fetchComments();
+      }, 500); // Adjust the delay as needed
     } catch (error) {
       console.error("Error deleting comment:", error);
-      toast.error("Error deleting comment");
     }
   };
 

@@ -40,61 +40,73 @@ const Favorite = ({ articleSlug, onUpdateFavorite, favCount }) => {
 
       // Check if user is logged in
       if (!userToken) {
-        // Redirect to the login page if user is not logged in
+        // Redirect to the login page if the user is not logged in
         navigate("/login");
         return;
       }
 
-      let toastMessage = ""; // Initialize toast message variable
+      const toastPromise = toast.promise(
+        async () => {
+          let toastMessage = ""; // Initialize toast message variable
 
-      if (isFavorited) {
-        await axios.delete(
-          `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
+          if (isFavorited) {
+            await axios.delete(
+              `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
+              {
+                headers: {
+                  Authorization: `Bearer ${userToken}`,
+                },
+              }
+            );
+
+            toastMessage = "Article unfavorited";
+          } else {
+            await axios.post(
+              `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
+              null,
+              {
+                headers: {
+                  Authorization: `Bearer ${userToken}`,
+                },
+              }
+            );
+
+            toastMessage = "Article favorited";
           }
-        );
 
-        toastMessage = "Article unfavorited";
-      } else {
-        await axios.post(
-          `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
-          null,
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        );
+          // Fetch updated data after the toggle
+          const response = await axios.get(
+            `https://api.realworld.io/api/articles/${articleSlug}`,
+            {
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
 
-        toastMessage = "Article favorited";
-      }
+          // Update favorite status after the toggle
+          setIsFavorited(response.data.article.favorited);
+          onUpdateFavorite(response.data.article);
 
-      // Update favorite status after the toggle
-      const response = await axios.get(
-        `https://api.realworld.io/api/articles/${articleSlug}`,
+          console.log(
+            `Article ${
+              response.data.article.favorited ? "favorited" : "unfavorited"
+            }`
+          );
+
+          return toastMessage;
+        },
         {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+          loading: "Toggling favorite...",
+          success: (message) => ({
+            content: message,
+            icon: `${isFavorited ? "❤️" : "💔"}`,
+          }),
+          error: "Error toggling favorite",
         }
       );
 
-      setIsFavorited(response.data.article.favorited);
-      onUpdateFavorite(response.data.article);
-
-      // Show toast with heart icon based on favorited status
-      toast(`${toastMessage}`, {
-        icon: `${response.data.article.favorited ? "❤️" : "💔"}`,
-      });
-
-      console.log(
-        `Article ${
-          response.data.article.favorited ? "favorited" : "unfavorited"
-        }`
-      );
+      await toastPromise();
     } catch (error) {
       console.error("Error toggling favorite:", error);
     } finally {

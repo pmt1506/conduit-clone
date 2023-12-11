@@ -60,53 +60,64 @@ const FavoriteButton = ({ articleSlug }) => {
         return;
       }
 
-      if (isFavoriting) {
-        // If already favorited, perform unfavorite using DELETE
-        await axios.delete(
-          `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
+      const toastPromise = toast.promise(
+        async () => {
+          if (isFavoriting) {
+            // If already favorited, perform unfavorite using DELETE
+            await axios.delete(
+              `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
+              {
+                headers: {
+                  Authorization: `Bearer ${userToken}`,
+                },
+              }
+            );
+          } else {
+            // If not favorited, perform favorite using POST
+            await axios.post(
+              `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
+              null,
+              {
+                headers: {
+                  Authorization: `Bearer ${userToken}`,
+                },
+              }
+            );
           }
-        );
-      } else {
-        // If not favorited, perform favorite using POST
-        await axios.post(
-          `https://api.realworld.io/api/articles/${articleSlug}/favorite`,
-          null,
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        );
-      }
 
-      // Update favorite status and count after the toggle
-      const response = await axios.get(
-        `https://api.realworld.io/api/articles/${articleSlug}`,
+          // Fetch updated data after the toggle
+          const response = await axios.get(
+            `https://api.realworld.io/api/articles/${articleSlug}`,
+            {
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
+
+          // Update favorite status and count after the toggle
+          setIsFavoriting(response.data.article.favorited);
+          setFavCount(response.data.article.favoritesCount);
+          setCheck(!check); // Toggle the check variable to trigger re-render
+
+          // Display toast notification based on favorited/unfavorited status
+          return `${
+            response.data.article.favorited
+              ? "Article Favorited!"
+              : "Article Unfavorited!"
+          }`;
+        },
         {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+          loading: "Toggling favorite...",
+          success: (message) => ({
+            content: message,
+            icon: `${isFavoriting ? "❤️" : "💔"}`,
+          }),
+          error: "Error toggling favorite",
         }
       );
-      setIsFavoriting(response.data.article.favorited);
-      setFavCount(response.data.article.favoritesCount);
-      setCheck(!check); // Toggle the check variable to trigger re-render
 
-      // Display toast notification based on favorited/unfavorited status
-      toast(
-        `${
-          response.data.article.favorited
-            ? "Article Favorited!"
-            : "Article Unfavorited!"
-        }`,
-        {
-          icon: `${response.data.article.favorited ? "❤️" : "💔"}`,
-        }
-      );
+      await toastPromise();
     } catch (error) {
       console.error("Error toggling favorite:", error);
     } finally {
