@@ -1,9 +1,29 @@
 // Comment.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../../css/Articles.css";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const Comment = ({ comment, fetchComments }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get("https://api.realworld.io/api/user", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+        });
+        setCurrentUser(response.data.user);
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
   const handleDeleteComment = async () => {
     try {
       await axios.delete(
@@ -16,10 +36,15 @@ const Comment = ({ comment, fetchComments }) => {
       );
       // After successful deletion, fetch comments again to update the UI
       fetchComments();
+      toast.success("Comment deleted successfully!");
     } catch (error) {
       console.error("Error deleting comment:", error);
+      toast.error("Error deleting comment");
     }
   };
+
+  const isCommentDeletable =
+    currentUser && currentUser.username === comment.author.username;
 
   return (
     <div key={comment.id} className="comment-form card">
@@ -46,7 +71,7 @@ const Comment = ({ comment, fetchComments }) => {
         </span>
         {/* Clickable icon for delete */}
         <span className="mod-options" onClick={handleDeleteComment}>
-          <i className="bi bi-trash3-fill"></i>
+          {isCommentDeletable && <i className="bi bi-trash3-fill"></i>}
         </span>
       </div>
     </div>
