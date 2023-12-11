@@ -127,7 +127,7 @@ const Settings = () => {
     <div>
       <div className="container">
         <div className="row">
-          <div className="offset-md-3 col-xs-12 setting-container">
+          <div className="col-md-10 offset-md-1 col-xs-12 ">
             <h1 className="text-center">Settings</h1>
             {loading ? ( // Show loader when data is being fetched
               <div className="loading-spinner">
