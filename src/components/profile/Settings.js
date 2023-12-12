@@ -71,48 +71,36 @@ const Settings = () => {
     try {
       setLoading(true);
 
-      const toastPromise = toast.promise(
-        async () => {
-          const response = await axios.put(
-            "https://api.realworld.io/api/user",
-            {
-              user: {
-                email,
-                password: newPassword,
-                username,
-                bio,
-                image: profilePictureLink,
-              },
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-              },
-            }
-          );
-
-          const updatedUser = response.data.user;
-          const newToken = response.data.user.token;
-
-          setUser(updatedUser);
-          localStorage.setItem("userToken", newToken);
-
-          console.log("Updated User:", updatedUser);
-          return "Settings updated successfully!";
+      const response = await axios.put(
+        "https://api.realworld.io/api/user",
+        {
+          user: {
+            email,
+            password: newPassword,
+            username,
+            bio,
+            image: profilePictureLink,
+          },
         },
         {
-          loading: "Updating settings...",
-          success: (message) => ({
-            content: message,
-            icon: "🚀", // Use any icon you prefer
-          }),
-          error: "Error updating settings",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
         }
       );
 
-      await toastPromise;
+      const updatedUser = response.data.user;
+      const newToken = response.data.user.token;
 
-      navigate(`/@${user.username}`);
+      setUser(updatedUser);
+      localStorage.setItem("userToken", newToken);
+
+      console.log("Updated User:", updatedUser);
+      console.log("Settings updated successfully!");
+
+      toast.success("Settings updated successfully!");
+
+      navigate(`/@${updatedUser.username}`);
     } catch (error) {
       console.error("Error:", error);
     } finally {

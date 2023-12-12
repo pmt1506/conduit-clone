@@ -36,64 +36,48 @@ const FollowButton = ({ profileUsername = "", onUpdateFollow, pageStyle }) => {
     try {
       setIsToggling(true);
 
-      // Check if the user is logged in before proceeding
       if (!userToken) {
         // If not logged in, navigate to the login page
         window.location.href = "/login";
         return;
       }
 
-      const toastPromise = toast.promise(
-        async () => {
-          if (isFollowing) {
-            // If already following, perform unfollow using DELETE
-            await axios.delete(
-              `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
-              {
-                headers: {
-                  Authorization: `Bearer ${userToken}`,
-                },
-              }
-            );
-          } else {
-            // If not following, perform follow using POST
-            await axios.post(
-              `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
-              null,
-              {
-                headers: {
-                  Authorization: `Bearer ${userToken}`,
-                },
-              }
-            );
+      if (isFollowing) {
+        // If already following, perform unfollow using DELETE
+        await axios.delete(
+          `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
           }
+        );
+      } else {
+        // If not following, perform follow using POST
+        await axios.post(
+          `https://api.realworld.io/api/profiles/${profileUsername}/follow`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+      }
 
-          // Fetch updated follow status after the toggle
-          const response = await axios.get(
-            `https://api.realworld.io/api/profiles/${profileUsername}`,
-            {
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            }
-          );
-          onUpdateFollow(response.data.profile);
-
-          return `${
-            isFollowing ? "Unfollowed" : "Followed"
-          } ${profileUsername}`;
-        },
+      // Update follow status after the toggle
+      const response = await axios.get(
+        `https://api.realworld.io/api/profiles/${profileUsername}`,
         {
-          loading: `${isFollowing ? "Unfollowing" : "Following"}...`,
-          success: (message) => ({
-            content: message,
-            icon: `${isFollowing ? "❌" : "➕"}`,
-          }),
-          error: "Error toggling follow",
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
         }
       );
+      onUpdateFollow(response.data.profile);
 
-      await toastPromise();
+      // Display toast notification based on follow/unfollow status
+      toast.success(`${isFollowing ? "Unfollowed " : "Followed "} ${profileUsername}`);
     } catch (error) {
       console.error("Error toggling follow:", error);
     } finally {
