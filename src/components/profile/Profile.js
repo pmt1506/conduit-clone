@@ -24,12 +24,10 @@ const Profile = () => {
     const fetchProfileData = async () => {
       try {
         const response = await axios.get(
-          `https://api.realworld.io/api/profiles/${profileUsername.substring(
-            1
-          )}`,
+          `https://api.realworld.io/api/profiles/${profileUsername.substring(1)}`,
           {
             headers: {
-              Authorization: `Bearer ${userToken}`,
+              Authorization: userToken ? `Bearer ${userToken}` : undefined,
             },
           }
         );
@@ -76,6 +74,8 @@ const Profile = () => {
     console.log("Following: ", isFollowing);
   }, [isFollowing]);
 
+  console.log(user);
+
   return (
     <div className="profile-page">
       {loading ? (
@@ -95,39 +95,37 @@ const Profile = () => {
                   textAlign: "center",
                 }}
               >
-                {user && (
-                  <>
-                    <img src={user.image} alt="#" className="user-img" />
-                    <h4>{user.username}</h4>
-                    <p>{user.bio}</p>
-                    {!isOwnProfile && (
-                      <div>
-                        <FollowButton
-                          key={isFollowing ? "following" : "notFollowing"}
-                          profileUsername={user.username}
-                          isFollowing={isFollowing}
-                          onUpdateFollow={handleUpdateFollow}
-                          pageStyle="profile-button"
-                        />
-                      </div>
-                    )}
-                    {isOwnProfile && (
-                      <div>
-                        <a
-                          href="/settings"
-                          className="btn btn-sm btn-outline-secondary action-btn"
-                          style={{ float: "right", marginRight: "10px" }}
-                        >
-                          <i
-                            className="bi bi-gear"
-                            style={{ marginRight: "0.15rem" }}
-                          ></i>
-                          Edit Profile Settings
-                        </a>
-                      </div>
-                    )}
-                  </>
-                )}
+                <>
+                  <img src={user.image} alt="#" className="user-img" />
+                  {user.username && <h4>{user.username}</h4>}
+                  {user.bio && <p>{user.bio}</p>}
+                  {!isOwnProfile && (
+                    <div>
+                      <FollowButton
+                        key={isFollowing ? "following" : "notFollowing"}
+                        profileUsername={user.username}
+                        isFollowing={isFollowing}
+                        onUpdateFollow={handleUpdateFollow}
+                        pageStyle="profile-button"
+                      />
+                    </div>
+                  )}
+                  {isOwnProfile && (
+                    <div>
+                      <a
+                        href="/settings"
+                        className="btn btn-sm btn-outline-secondary action-btn"
+                        style={{ float: "right", marginRight: "10px" }}
+                      >
+                        <i
+                          className="bi bi-gear"
+                          style={{ marginRight: "0.15rem" }}
+                        ></i>
+                        Edit Profile Settings
+                      </a>
+                    </div>
+                  )}
+                </>
               </div>
             </div>
           </div>
@@ -138,20 +136,18 @@ const Profile = () => {
                   <ul className="nav nav-pills outline-active">
                     <li className="nav-item">
                       <a
-                        className={`nav-link ${
-                          selectedTab === "myArticles" && "active"
-                        }`}
+                        className={`nav-link ${selectedTab === "myArticles" && "active"
+                          }`}
                         style={{ color: "#555", cursor: "pointer" }}
                         onClick={() => setSelectedTab("myArticles")}
                       >
-                        {user.username}'s Articles
+                        {user?.username}'s Articles
                       </a>
                     </li>
                     <li className="nav-item">
                       <a
-                        className={`nav-link ${
-                          selectedTab === "favoritedArticles" && "active"
-                        }`}
+                        className={`nav-link ${selectedTab === "favoritedArticles" && "active"
+                          }`}
                         style={{ color: "#555", cursor: "pointer" }}
                         onClick={() => setSelectedTab("favoritedArticles")}
                       >
@@ -178,6 +174,7 @@ const Profile = () => {
       )}
     </div>
   );
+
 };
 
 export default Profile;
